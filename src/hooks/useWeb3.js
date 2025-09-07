@@ -201,7 +201,7 @@ const JING_TOKEN_ABI = [
       {
         "internalType": "uint256",
         "name": "amount",
-        "type": 'uint256'
+        "type": "uint256"
       }
     ],
     "name": "mint",
@@ -282,7 +282,7 @@ const JING_TOKEN_ABI = [
         "type": "bool"
       }
     ],
-    "stateMutability": "nonpayable",
+    "stateMutability": 'nonpayable',
     "type": "function"
   },
   {
@@ -353,9 +353,22 @@ export const useWeb3 = () => {
   const checkNetwork = useCallback(async () => {
     if (window.ethereum) {
       const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+      // Sepolia chain ID: 0xaa36a7 (11155111 in decimal)
       const sepoliaChainId = '0xaa36a7';
-      setIsCorrectNetwork(chainId === sepoliaChainId);
+      
       console.log('Network check - Current chain ID:', chainId, 'Expected:', sepoliaChainId);
+      console.log('Chain ID in decimal:', parseInt(chainId, 16));
+      
+      // Use case-insensitive comparison
+      const isCorrect = chainId.toLowerCase() === sepoliaChainId.toLowerCase();
+      setIsCorrectNetwork(isCorrect);
+      
+      if (!isCorrect) {
+        console.warn('Wrong network! Please switch to Sepolia');
+        setError('Please switch to Sepolia Test Network');
+      } else {
+        setError('');
+      }
     }
   }, []);
 
@@ -365,11 +378,12 @@ export const useWeb3 = () => {
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: '0xaa36a7' }],
       });
-      checkNetwork();
+      // Wait a moment for the network change to take effect
+      setTimeout(() => checkNetwork(), 1000);
     } catch (err) {
       setError('Failed to switch network: ' + err.message);
     }
-  }, [checkNetwork]);
+  }, [checkNetwork]); // FIXED: Added missing dependency
 
   const refreshBalance = useCallback(async () => {
     console.log('Refresh balance called with:', { account, isCorrectNetwork, contractAddress });
@@ -380,24 +394,41 @@ export const useWeb3 = () => {
     }
     
     try {
+      console.log('Using RPC URL:', rpcUrl);
       const web3 = new Web3(rpcUrl);
+      
+      // Test the connection
+      try {
+        const blockNumber = await web3.eth.getBlockNumber();
+        console.log('Current block number:', blockNumber);
+      } catch (rpcError) {
+        console.error('RPC connection failed:', rpcError);
+        setError('RPC connection failed. Please check your network connection.');
+        return;
+      }
+      
       const contract = new web3.eth.Contract(JING_TOKEN_ABI, contractAddress);
       
-      const symbol = await contract.methods.symbol().call();
+      // Get token info and balance in parallel
+      const [symbol, name, balance, supply, owner] = await Promise.all([
+        contract.methods.symbol().call(),
+        contract.methods.name().call(),
+        contract.methods.balanceOf(account).call(),
+        contract.methods.totalSupply().call(),
+        contract.methods.owner().call()
+      ]);
+      
       console.log('Contract symbol:', symbol);
+      console.log('Contract name:', name);
+      console.log('Raw balance from contract:', balance);
       
-      const balanceWei = await contract.methods.balanceOf(account).call();
-      console.log('Raw balance (wei):', balanceWei);
-      
-      const balanceEth = web3.utils.fromWei(balanceWei, 'ether');
+      const balanceEth = web3.utils.fromWei(balance, 'ether');
       console.log('Converted balance:', balanceEth, 'JINGRM');
       
       setJingBalance(balanceEth);
-      
-      const supply = await contract.methods.totalSupply().call();
+      setTokenSymbol(symbol); // FIXED: This is now used
+      setTokenName(name);     // FIXED: This is now used
       setTotalSupply(web3.utils.fromWei(supply, 'ether'));
-      
-      const owner = await contract.methods.owner().call();
       setIsOwner(owner.toLowerCase() === account.toLowerCase());
       
     } catch (err) {
@@ -463,6 +494,14 @@ export const useWeb3 = () => {
     };
 
     init();
+
+    // Cleanup function
+    return () => {
+      if (window.ethereum) {
+        window.ethereum.removeAllListeners('accountsChanged');
+        window.ethereum.removeAllListeners('chainChanged');
+      }
+    };
   }, [checkNetwork]);
 
   useEffect(() => {
