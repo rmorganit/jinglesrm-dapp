@@ -1,7 +1,139 @@
 import { useState, useEffect, useCallback } from 'react';
 import Web3 from 'web3';
 
-const JING_TOKEN_ABI = [ /* Your ABI here */ ];
+const JING_TOKEN_ABI = [
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "name",
+    "outputs": [{"name": "", "type": "string"}],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "symbol",
+    "outputs": [{"name": "", "type": "string"}],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "decimals",
+    "outputs": [{"name": "", "type": "uint8"}],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "totalSupply",
+    "outputs": [{"name": "", "type": "uint256"}],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [{"name": "_owner", "type": "address"}],
+    "name": "balanceOf",
+    "outputs": [{"name": "balance", "type": "uint256"}],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {"name": "_to", "type": "address"},
+      {"name": "_value", "type": "uint256"}
+    ],
+    "name": "transfer",
+    "outputs": [{"name": "", "type": "bool"}],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {"name": "_from", "type": "address"},
+      {"name": "_to", "type": "address"},
+      {"name": "_value", "type": "uint256"}
+    ],
+    "name": "transferFrom",
+    "outputs": [{"name": "", "type": "bool"}],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {"name": "_spender", "type": "address"},
+      {"name": "_value", "type": "uint256"}
+    ],
+    "name": "approve",
+    "outputs": [{"name": "", "type": "bool"}],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {"name": "_owner", "type": "address"},
+      {"name": "_spender", "type": "address"}
+    ],
+    "name": "allowance",
+    "outputs": [{"name": "", "type": "uint256"}],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {"indexed": true, "name": "from", "type": "address"},
+      {"indexed": true, "name": "to", "type": "address"},
+      {"indexed": false, "name": "value", "type": "uint256"}
+    ],
+    "name": "Transfer",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {"indexed": true, "name": "owner", "type": "address"},
+      {"indexed": true, "name": "spender", "type": "address"},
+      {"indexed": false, "name": "value", "type": "uint256"}
+    ],
+    "name": "Approval",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {"internalType": "address", "name": "to", "type": "address"},
+      {"internalType": "uint256", "name": "amount", "type": "uint256"}
+    ],
+    "name": "mint",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [{"internalType": "address", "name": "", "type": "address"}],
+    "stateMutability": "view",
+    "type": "function"
+  }
+];
 
 export const useWeb3 = () => {
   const [account, setAccount] = useState(null);
@@ -23,7 +155,6 @@ export const useWeb3 = () => {
       const sepoliaChainId = '0xaa36a7';
       
       console.log('Network check - Current chain ID:', chainId, 'Expected:', sepoliaChainId);
-      console.log('Chain ID in decimal:', parseInt(chainId, 16));
       
       const isCorrect = chainId.toLowerCase() === sepoliaChainId.toLowerCase();
       setIsCorrectNetwork(isCorrect);
@@ -55,7 +186,7 @@ export const useWeb3 = () => {
     } catch (err) {
       setError('Failed to connect wallet: ' + err.message);
     }
-  }, [checkNetwork]); // FIXED: Added checkNetwork dependency
+  }, [checkNetwork]);
 
   const switchToSepolia = useCallback(async () => {
     try {
@@ -67,7 +198,7 @@ export const useWeb3 = () => {
     } catch (err) {
       setError('Failed to switch network: ' + err.message);
     }
-  }, [checkNetwork]); // FIXED: Added checkNetwork dependency
+  }, [checkNetwork]);
 
   const refreshBalance = useCallback(async () => {
     console.log('Refresh balance called with:', { account, isCorrectNetwork, contractAddress });
@@ -80,15 +211,6 @@ export const useWeb3 = () => {
     try {
       console.log('Using RPC URL:', rpcUrl);
       const web3 = new Web3(rpcUrl);
-      
-      try {
-        const blockNumber = await web3.eth.getBlockNumber();
-        console.log('Current block number:', blockNumber);
-      } catch (rpcError) {
-        console.error('RPC connection failed:', rpcError);
-        setError('RPC connection failed. Please check your network connection.');
-        return;
-      }
       
       const contract = new web3.eth.Contract(JING_TOKEN_ABI, contractAddress);
       
