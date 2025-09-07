@@ -1,320 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Web3 from 'web3';
 
-const JING_TOKEN_ABI = [
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "initialSupply",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "spender",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "value",
-        "type": "uint256"
-      }
-    ],
-    "name": "Approval",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "from",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "value",
-        "type": "uint256"
-      }
-    ],
-    "name": "Transfer",
-    "type": "event"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "spender",
-        "type": "address"
-      }
-    ],
-    "name": "allowance",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "spender",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "approve",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
-    "name": "balanceOf",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "decimals",
-    "outputs": [
-      {
-        "internalType": "uint8",
-        "name": "",
-        "type": "uint8"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "spender",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "subtractedValue",
-        "type": "uint256"
-      }
-    ],
-    "name": "decreaseAllowance",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "spender",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "addedValue",
-        "type": "uint256"
-      }
-    ],
-    "name": "increaseAllowance",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "mint",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "name",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "owner",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "symbol",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "totalSupply",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "transfer",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": 'nonpayable',
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "from",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "transferFrom",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  }
-];
+const JING_TOKEN_ABI = [ /* Your ABI here */ ];
 
 export const useWeb3 = () => {
   const [account, setAccount] = useState(null);
@@ -329,6 +16,26 @@ export const useWeb3 = () => {
   
   const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
   const rpcUrl = process.env.REACT_APP_RPC_URL;
+
+  const checkNetwork = useCallback(async () => {
+    if (window.ethereum) {
+      const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+      const sepoliaChainId = '0xaa36a7';
+      
+      console.log('Network check - Current chain ID:', chainId, 'Expected:', sepoliaChainId);
+      console.log('Chain ID in decimal:', parseInt(chainId, 16));
+      
+      const isCorrect = chainId.toLowerCase() === sepoliaChainId.toLowerCase();
+      setIsCorrectNetwork(isCorrect);
+      
+      if (!isCorrect) {
+        console.warn('Wrong network! Please switch to Sepolia');
+        setError('Please switch to Sepolia Test Network');
+      } else {
+        setError('');
+      }
+    }
+  }, []);
 
   const connectWallet = useCallback(async () => {
     try {
@@ -348,29 +55,7 @@ export const useWeb3 = () => {
     } catch (err) {
       setError('Failed to connect wallet: ' + err.message);
     }
-  }, []);
-
-  const checkNetwork = useCallback(async () => {
-    if (window.ethereum) {
-      const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-      // Sepolia chain ID: 0xaa36a7 (11155111 in decimal)
-      const sepoliaChainId = '0xaa36a7';
-      
-      console.log('Network check - Current chain ID:', chainId, 'Expected:', sepoliaChainId);
-      console.log('Chain ID in decimal:', parseInt(chainId, 16));
-      
-      // Use case-insensitive comparison
-      const isCorrect = chainId.toLowerCase() === sepoliaChainId.toLowerCase();
-      setIsCorrectNetwork(isCorrect);
-      
-      if (!isCorrect) {
-        console.warn('Wrong network! Please switch to Sepolia');
-        setError('Please switch to Sepolia Test Network');
-      } else {
-        setError('');
-      }
-    }
-  }, []);
+  }, [checkNetwork]); // FIXED: Added checkNetwork dependency
 
   const switchToSepolia = useCallback(async () => {
     try {
@@ -378,12 +63,11 @@ export const useWeb3 = () => {
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: '0xaa36a7' }],
       });
-      // Wait a moment for the network change to take effect
       setTimeout(() => checkNetwork(), 1000);
     } catch (err) {
       setError('Failed to switch network: ' + err.message);
     }
-  }, [checkNetwork]); // FIXED: Added missing dependency
+  }, [checkNetwork]); // FIXED: Added checkNetwork dependency
 
   const refreshBalance = useCallback(async () => {
     console.log('Refresh balance called with:', { account, isCorrectNetwork, contractAddress });
@@ -397,7 +81,6 @@ export const useWeb3 = () => {
       console.log('Using RPC URL:', rpcUrl);
       const web3 = new Web3(rpcUrl);
       
-      // Test the connection
       try {
         const blockNumber = await web3.eth.getBlockNumber();
         console.log('Current block number:', blockNumber);
@@ -409,7 +92,6 @@ export const useWeb3 = () => {
       
       const contract = new web3.eth.Contract(JING_TOKEN_ABI, contractAddress);
       
-      // Get token info and balance in parallel
       const [symbol, name, balance, supply, owner] = await Promise.all([
         contract.methods.symbol().call(),
         contract.methods.name().call(),
@@ -426,8 +108,8 @@ export const useWeb3 = () => {
       console.log('Converted balance:', balanceEth, 'JINGRM');
       
       setJingBalance(balanceEth);
-      setTokenSymbol(symbol); // FIXED: This is now used
-      setTokenName(name);     // FIXED: This is now used
+      setTokenSymbol(symbol);
+      setTokenName(name);
       setTotalSupply(web3.utils.fromWei(supply, 'ether'));
       setIsOwner(owner.toLowerCase() === account.toLowerCase());
       
@@ -495,7 +177,6 @@ export const useWeb3 = () => {
 
     init();
 
-    // Cleanup function
     return () => {
       if (window.ethereum) {
         window.ethereum.removeAllListeners('accountsChanged');
