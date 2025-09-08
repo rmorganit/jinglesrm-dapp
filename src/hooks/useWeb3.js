@@ -151,19 +151,24 @@ export const useWeb3 = () => {
 
   const checkNetwork = useCallback(async () => {
     if (window.ethereum) {
-      const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-      const sepoliaChainId = '0xaa36a7';
-      
-      console.log('Network check - Current chain ID:', chainId, 'Expected:', sepoliaChainId);
-      
-      const isCorrect = chainId.toLowerCase() === sepoliaChainId.toLowerCase();
-      setIsCorrectNetwork(isCorrect);
-      
-      if (!isCorrect) {
-        console.warn('Wrong network! Please switch to Sepolia');
-        setError('Please switch to Sepolia Test Network');
-      } else {
-        setError('');
+      try {
+        const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+        const sepoliaChainId = '0xaa36a7';
+        
+        console.log('Network check - Current chain ID:', chainId, 'Expected:', sepoliaChainId);
+        
+        const isCorrect = chainId.toLowerCase() === sepoliaChainId.toLowerCase();
+        setIsCorrectNetwork(isCorrect);
+        
+        if (!isCorrect) {
+          console.warn('Wrong network! Please switch to Sepolia');
+          setError('Please switch to Sepolia Test Network');
+        } else {
+          setError('');
+        }
+      } catch (err) {
+        console.error('Error checking network:', err);
+        setError('Failed to check network: ' + err.message);
       }
     }
   }, []);
@@ -179,7 +184,7 @@ export const useWeb3 = () => {
         const currentAccount = accounts[0];
         console.log('Connected account:', currentAccount);
         setAccount(currentAccount);
-        checkNetwork();
+        await checkNetwork();
       } else {
         setError('Please install MetaMask!');
       }
@@ -242,7 +247,9 @@ export const useWeb3 = () => {
   }, [account, isCorrectNetwork, contractAddress, rpcUrl]);
 
   const mintTokens = useCallback(async (amount) => {
-    if (!account || !isCorrectNetwork || !contractAddress) return;
+    if (!account || !isCorrectNetwork || !contractAddress) {
+      throw new Error('Wallet not connected or wrong network');
+    }
     
     try {
       const web3 = new Web3(window.ethereum);
