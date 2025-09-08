@@ -2,137 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Web3 from 'web3';
 
 const JING_TOKEN_ABI = [
-  {
-    "constant": true,
-    "inputs": [],
-    "name": "name",
-    "outputs": [{"name": "", "type": "string"}],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [],
-    "name": "symbol",
-    "outputs": [{"name": "", "type": "string"}],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [],
-    "name": "decimals",
-    "outputs": [{"name": "", "type": "uint8"}],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [],
-    "name": "totalSupply",
-    "outputs": [{"name": "", "type": "uint256"}],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [{"name": "_owner", "type": "address"}],
-    "name": "balanceOf",
-    "outputs": [{"name": "balance", "type": "uint256"}],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": false,
-    "inputs": [
-      {"name": "_to", "type": "address"},
-      {"name": "_value", "type": "uint256"}
-    ],
-    "name": "transfer",
-    "outputs": [{"name": "", "type": "bool"}],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "constant": false,
-    "inputs": [
-      {"name": "_from", "type": "address"},
-      {"name": "_to", "type": "address"},
-      {"name": "_value", "type": "uint256"}
-    ],
-    "name": "transferFrom",
-    "outputs": [{"name": "", "type": "bool"}],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "constant": false,
-    "inputs": [
-      {"name": "_spender", "type": "address"},
-      {"name": "_value", "type": "uint256"}
-    ],
-    "name": "approve",
-    "outputs": [{"name": "", "type": "bool"}],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [
-      {"name": "_owner", "type": "address"},
-      {"name": "_spender", "type": "address"}
-    ],
-    "name": "allowance",
-    "outputs": [{"name": "", "type": "uint256"}],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {"indexed": true, "name": "from", "type": "address"},
-      {"indexed": true, "name": "to", "type": "address"},
-      {"indexed": false, "name": "value", "type": "uint256"}
-    ],
-    "name": "Transfer",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {"indexed": true, "name": "owner", "type": "address"},
-      {"indexed": true, "name": "spender", "type": "address"},
-      {"indexed": false, "name": "value", "type": "uint256"}
-    ],
-    "name": "Approval",
-    "type": "event"
-  },
-  {
-    "inputs": [
-      {"internalType": "address", "name": "to", "type": "address"},
-      {"internalType": "uint256", "name": "amount", "type": "uint256"}
-    ],
-    "name": "mint",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "owner",
-    "outputs": [{"internalType": "address", "name": "", "type": "address"}],
-    "stateMutability": "view",
-    "type": "function"
-  }
+  // ... (same ABI as before)
 ];
 
 export const useWeb3 = () => {
@@ -145,9 +15,18 @@ export const useWeb3 = () => {
   const [isCorrectNetwork, setIsCorrectNetwork] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isOwner, setIsOwner] = useState(false);
+  const [transactionHistory, setTransactionHistory] = useState([]);
   
   const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
   const rpcUrl = process.env.REACT_APP_RPC_URL;
+
+  const clearError = useCallback(() => {
+    setError('');
+  }, []);
+
+  const addTransactionToHistory = useCallback((tx) => {
+    setTransactionHistory(prev => [tx, ...prev].slice(0, 10)); // Keep only last 10 transactions
+  }, []);
 
   const checkNetwork = useCallback(async () => {
     if (window.ethereum) {
@@ -155,34 +34,29 @@ export const useWeb3 = () => {
         const chainId = await window.ethereum.request({ method: 'eth_chainId' });
         const sepoliaChainId = '0xaa36a7';
         
-        console.log('Network check - Current chain ID:', chainId, 'Expected:', sepoliaChainId);
-        
         const isCorrect = chainId.toLowerCase() === sepoliaChainId.toLowerCase();
         setIsCorrectNetwork(isCorrect);
         
         if (!isCorrect) {
-          console.warn('Wrong network! Please switch to Sepolia');
           setError('Please switch to Sepolia Test Network');
         } else {
-          setError('');
+          clearError();
         }
       } catch (err) {
-        console.error('Error checking network:', err);
         setError('Failed to check network: ' + err.message);
       }
     }
-  }, []);
+  }, [clearError]);
 
   const connectWallet = useCallback(async () => {
     try {
-      setError('');
+      clearError();
       if (window.ethereum) {
         const accounts = await window.ethereum.request({
           method: 'eth_requestAccounts',
         });
         
         const currentAccount = accounts[0];
-        console.log('Connected account:', currentAccount);
         setAccount(currentAccount);
         await checkNetwork();
       } else {
@@ -191,12 +65,12 @@ export const useWeb3 = () => {
     } catch (err) {
       setError('Failed to connect wallet: ' + err.message);
     }
-  }, [checkNetwork]);
+  }, [checkNetwork, clearError]);
 
   const switchToSepolia = useCallback(async () => {
     try {
       await window.ethereum.request({
-        method: 'wallet_switchEhereumChain',
+        method: 'wallet_switchEthereumChain',
         params: [{ chainId: '0xaa36a7' }],
       });
       setTimeout(() => checkNetwork(), 1000);
@@ -206,17 +80,10 @@ export const useWeb3 = () => {
   }, [checkNetwork]);
 
   const refreshBalance = useCallback(async () => {
-    console.log('Refresh balance called with:', { account, isCorrectNetwork, contractAddress });
-    
-    if (!account || !isCorrectNetwork || !contractAddress) {
-      console.log('Missing requirements for balance refresh');
-      return;
-    }
+    if (!account || !isCorrectNetwork || !contractAddress) return;
     
     try {
-      console.log('Using RPC URL:', rpcUrl);
       const web3 = new Web3(rpcUrl);
-      
       const contract = new web3.eth.Contract(JING_TOKEN_ABI, contractAddress);
       
       const [symbol, name, balance, supply, owner] = await Promise.all([
@@ -227,12 +94,7 @@ export const useWeb3 = () => {
         contract.methods.owner().call()
       ]);
       
-      console.log('Contract symbol:', symbol);
-      console.log('Contract name:', name);
-      console.log('Raw balance from contract:', balance);
-      
       const balanceEth = web3.utils.fromWei(balance, 'ether');
-      console.log('Converted balance:', balanceEth, 'JINGRM');
       
       setJingBalance(balanceEth);
       setTokenSymbol(symbol);
@@ -241,7 +103,6 @@ export const useWeb3 = () => {
       setIsOwner(owner.toLowerCase() === account.toLowerCase());
       
     } catch (err) {
-      console.error('Error in refreshBalance:', err);
       setError('Failed to refresh balance: ' + err.message);
     }
   }, [account, isCorrectNetwork, contractAddress, rpcUrl]);
@@ -258,13 +119,20 @@ export const useWeb3 = () => {
       const amountInWei = web3.utils.toWei(amount.toString(), 'ether');
       const tx = await contract.methods.mint(account, amountInWei).send({ from: account });
       
+      // Add to transaction history
+      addTransactionToHistory({
+        hash: tx.transactionHash,
+        type: 'Mint',
+        amount: amount,
+        timestamp: Date.now()
+      });
+      
       await refreshBalance();
       return tx.transactionHash;
     } catch (err) {
-      console.error('Error minting tokens:', err);
       throw new Error('Failed to mint tokens: ' + err.message);
     }
-  }, [account, isCorrectNetwork, contractAddress, refreshBalance]);
+  }, [account, isCorrectNetwork, contractAddress, refreshBalance, addTransactionToHistory]);
 
   const transferTokens = useCallback(async (toAddress, amount) => {
     if (!account || !isCorrectNetwork || !contractAddress) {
@@ -283,20 +151,27 @@ export const useWeb3 = () => {
       const amountInWei = web3.utils.toWei(amount.toString(), 'ether');
       const tx = await contract.methods.transfer(toAddress, amountInWei).send({ from: account });
       
+      // Add to transaction history
+      addTransactionToHistory({
+        hash: tx.transactionHash,
+        type: 'Transfer',
+        amount: amount,
+        to: toAddress,
+        timestamp: Date.now()
+      });
+      
       await refreshBalance();
       return tx.transactionHash;
     } catch (err) {
-      console.error('Error transferring tokens:', err);
       throw new Error('Transfer failed: ' + err.message);
     }
-  }, [account, isCorrectNetwork, contractAddress, refreshBalance]);
+  }, [account, isCorrectNetwork, contractAddress, refreshBalance, addTransactionToHistory]);
 
   useEffect(() => {
     const init = async () => {
       if (window.ethereum) {
         const handleAccountsChanged = (accounts) => {
           if (accounts.length > 0) {
-            console.log('Account changed to:', accounts[0]);
             setAccount(accounts[0]);
           } else {
             setAccount(null);
@@ -315,7 +190,6 @@ export const useWeb3 = () => {
             method: 'eth_accounts' 
           });
           if (accounts.length > 0) {
-            console.log('Initial account:', accounts[0]);
             setAccount(accounts[0]);
           }
         } catch (error) {
@@ -360,6 +234,8 @@ export const useWeb3 = () => {
     mintTokens,
     transferTokens,
     isOwner,
-    contractAddress
+    contractAddress,
+    transactionHistory,
+    clearError
   };
 };

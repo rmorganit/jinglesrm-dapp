@@ -1,293 +1,140 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* Add these new styles to your existing App.css */
+
+/* Loading spinner */
+.button-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  min-height: 100vh;
-  color: #333;
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ffffff;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 
-.app {
-  min-height: 100vh;
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Input groups with labels */
+.input-group {
   display: flex;
   flex-direction: column;
+  gap: 0.5rem;
 }
 
-.app-header {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  padding: 2rem;
-  text-align: center;
-  color: white;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-}
-
-.app-header h1 {
-  font-size: 2.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.app-header p {
-  opacity: 0.9;
-}
-
-.app-main {
-  flex: 1;
-  padding: 2rem;
-  max-width: 800px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-.connect-section {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 50vh;
-}
-
-.card {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  padding: 2rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.status-card {
-  display: grid;
-  grid-template-columns: auto 1fr 1fr;
-  gap: 1.5rem;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.status-badge {
-  background: #4caf50;
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.9rem;
+.input-group label {
   font-weight: bold;
-}
-
-.account-info, .network-info {
-  text-align: center;
-}
-
-.account-info h3, .network-info h3 {
   font-size: 0.9rem;
   color: #666;
-  margin-bottom: 0.25rem;
 }
 
-.connect-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  padding: 1rem 2rem;
-  border-radius: 50px;
-  font-size: 1.1rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+/* Status messages */
+.status-message {
+  padding: 0.75rem;
+  border-radius: 8px;
   margin-top: 1rem;
-}
-
-.connect-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-}
-
-/* Your Balance heading - 25% smaller */
-.card h2 {
-  font-size: 1.5rem; /* Reduced from approx 2rem */
   text-align: center;
-  margin-bottom: 1rem;
+  font-weight: 500;
 }
 
-/* Balance amount - 40% smaller */
-.balance-amount {
-  font-size: 1.8rem; /* Reduced from 3rem */
-  font-weight: bold;
-  text-align: center;
-  margin: 1.5rem 0;
-  color: #333;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.status-message.success {
+  background: #e8f5e8;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
 }
 
-.refresh-button, .mint-button, .transfer-button {
-  background: #6200ea;
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 50px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.2s;
-  width: 100%;
+.status-message.error {
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
 }
 
-.refresh-button:hover, .mint-button:hover, .transfer-button:hover {
-  background: #3700b3;
+/* Transaction history */
+.transaction-section {
+  border-left: 4px solid #2196f3;
 }
 
-.refresh-button:disabled, .mint-button:disabled, .transfer-button:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-}
-
-/* Mint Tokens heading - 20% smaller */
-.mint-section h2, .transfer-section h2 {
-  font-size: 1.6rem; /* Reduced from approx 2rem */
-  margin-bottom: 1rem;
-}
-
-.mint-section {
-  border-left: 4px solid #ff9800;
-}
-
-.transfer-section {
-  border-left: 4px solid #4caf50;
-}
-
-.mint-controls, .transfer-controls {
+.transaction-list {
   display: flex;
   flex-direction: column;
+  gap: 0.75rem;
+}
+
+.transaction-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
   gap: 1rem;
-  margin: 1rem 0;
-}
-
-.mint-input, .transfer-input, .transfer-amount-input {
+  align-items: center;
   padding: 0.75rem;
-  border: 2px solid #ddd;
-  border-radius: 10px;
-  font-size: 1rem;
-  width: 100%;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
 }
 
-.mint-input:focus, .transfer-input:focus, .transfer-amount-input:focus {
-  outline: none;
-  border-color: #6200ea;
+.transaction-type {
+  background: #e3f2fd;
+  color: #1976d2;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
 }
 
-.mint-status, .transfer-status {
-  text-align: center;
-  margin-top: 1rem;
-  padding: 0.5rem;
-  border-radius: 10px;
-  background: #e8f5e8;
+.transaction-hash {
+  font-family: monospace;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.transaction-amount {
+  font-weight: bold;
   color: #2e7d32;
 }
 
-/* Token Information heading - 20% smaller */
-.info-grid h2 {
-  font-size: 1.6rem; /* Reduced from approx 2rem */
-  margin-bottom: 1rem;
+.transaction-date {
+  font-size: 0.8rem;
+  color: #999;
 }
 
-.info-grid {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 1rem;
-}
-
-.info-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #eee;
-}
-
-.info-label {
-  font-weight: bold;
-  color: #666;
-}
-
-.network-alert {
-  background: #ffebee;
-  color: #c62828;
-  padding: 1rem;
-  border-radius: 10px;
-  margin-bottom: 1.5rem;
-  text-align: center;
-  border-left: 4px solid #c62828;
-}
-
-.network-alert button {
-  background: #c62828;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
-  margin-top: 0.5rem;
-  cursor: pointer;
-}
-
+/* Error message with dismiss button */
 .error-message {
-  background: #ffebee;
+  position: relative;
+  padding-right: 2.5rem;
+}
+
+.dismiss-error {
+  position: absolute;
+  right: 0.75rem;
+  top: 0.75rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
   color: #c62828;
-  padding: 1rem;
-  border-radius: 10px;
-  margin-top: 1rem;
-  text-align: center;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.app-footer {
-  background: rgba(0, 0, 0, 0.2);
-  color: white;
-  text-align: center;
-  padding: 1rem;
-  margin-top: 2rem;
-}
-
+/* Responsive adjustments for transaction history */
 @media (max-width: 768px) {
-  .app-main {
-    padding: 1rem;
-  }
-  
-  .status-card {
+  .transaction-item {
     grid-template-columns: 1fr;
+    gap: 0.5rem;
     text-align: center;
   }
   
-  .mint-controls, .transfer-controls {
-    flex-direction: column;
-  }
-  
-  .info-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .balance-amount {
-    font-size: 1.4rem; /* Adjusted for mobile */
-  }
-  
-  .card h2 {
-    font-size: 1.3rem; /* Adjusted for mobile */
-  }
-  
-  .mint-section h2, .transfer-section h2 {
-    font-size: 1.4rem; /* Adjusted for mobile */
-  }
-  
-  .info-grid h2 {
-    font-size: 1.4rem; /* Adjusted for mobile */
+  .transaction-type {
+    justify-self: center;
   }
 }
