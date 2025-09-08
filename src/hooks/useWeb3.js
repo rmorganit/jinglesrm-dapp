@@ -90,7 +90,6 @@ export const useWeb3 = () => {
   const [isOwner, setIsOwner] = useState(false);
   
   const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
-  const rpcUrl = process.env.REACT_APP_RPC_URL || 'https://sepolia.infura.io/v3/';
 
   const clearError = useCallback(() => {
     setError('');
