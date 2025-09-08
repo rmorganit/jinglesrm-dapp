@@ -196,7 +196,7 @@ export const useWeb3 = () => {
   const switchToSepolia = useCallback(async () => {
     try {
       await window.ethereum.request({
-        method: 'wallet_switchEthereumChain',
+        method: 'wallet_switchEhereumChain',
         params: [{ chainId: '0xaa36a7' }],
       });
       setTimeout(() => checkNetwork(), 1000);
@@ -263,6 +263,31 @@ export const useWeb3 = () => {
     } catch (err) {
       console.error('Error minting tokens:', err);
       throw new Error('Failed to mint tokens: ' + err.message);
+    }
+  }, [account, isCorrectNetwork, contractAddress, refreshBalance]);
+
+  const transferTokens = useCallback(async (toAddress, amount) => {
+    if (!account || !isCorrectNetwork || !contractAddress) {
+      throw new Error('Wallet not connected or wrong network');
+    }
+    
+    try {
+      const web3 = new Web3(window.ethereum);
+      const contract = new web3.eth.Contract(JING_TOKEN_ABI, contractAddress);
+      
+      // Validate address
+      if (!web3.utils.isAddress(toAddress)) {
+        throw new Error('Invalid recipient address');
+      }
+      
+      const amountInWei = web3.utils.toWei(amount.toString(), 'ether');
+      const tx = await contract.methods.transfer(toAddress, amountInWei).send({ from: account });
+      
+      await refreshBalance();
+      return tx.transactionHash;
+    } catch (err) {
+      console.error('Error transferring tokens:', err);
+      throw new Error('Transfer failed: ' + err.message);
     }
   }, [account, isCorrectNetwork, contractAddress, refreshBalance]);
 
@@ -333,6 +358,7 @@ export const useWeb3 = () => {
     isLoading,
     refreshBalance,
     mintTokens,
+    transferTokens,
     isOwner,
     contractAddress
   };
