@@ -19,7 +19,7 @@ body {
 
 .app {
   width: 100%;
-  max-width: 600px; /* Reduced from 800px */
+  max-width: 600px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -28,23 +28,23 @@ body {
 .app-header {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
-  padding: 1.2rem; /* Reduced padding */
+  padding: 1.2rem;
   text-align: center;
   color: white;
   text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-  border-radius: 15px; /* Smaller radius */
-  margin-bottom: 1.2rem; /* Reduced margin */
+  border-radius: 15px;
+  margin-bottom: 1.2rem;
   width: 100%;
 }
 
 .app-header h1 {
-  font-size: 1.8rem; /* Smaller font */
+  font-size: 1.8rem;
   margin-bottom: 0.4rem;
 }
 
 .app-header p {
   opacity: 0.9;
-  font-size: 0.9rem; /* Smaller font */
+  font-size: 0.9rem;
 }
 
 .app-main {
@@ -58,17 +58,17 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 40vh; /* Reduced height */
+  min-height: 40vh;
   width: 100%;
 }
 
 .card {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  border-radius: 15px; /* Smaller radius */
-  padding: 1.2rem; /* Reduced padding */
-  margin-bottom: 1rem; /* Reduced margin */
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); /* Smaller shadow */
+  border-radius: 15px;
+  padding: 1.2rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   width: 100%;
 }
@@ -76,14 +76,14 @@ body {
 .status-card {
   display: grid;
   grid-template-columns: auto 1fr 1fr;
-  gap: 1rem; /* Reduced gap */
+  gap: 1rem;
   align-items: center;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  border-radius: 15px; /* Smaller radius */
-  padding: 1rem; /* Reduced padding */
-  margin-bottom: 1rem; /* Reduced margin */
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); /* Smaller shadow */
+  border-radius: 15px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   width: 100%;
 }
@@ -91,9 +91,9 @@ body {
 .status-badge {
   background: #4caf50;
   color: white;
-  padding: 0.4rem 0.8rem; /* Reduced padding */
-  border-radius: 15px; /* Smaller radius */
-  font-size: 0.8rem; /* Smaller font */
+  padding: 0.4rem 0.8rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
   font-weight: bold;
 }
 
@@ -102,7 +102,7 @@ body {
 }
 
 .account-info h3, .network-info h3 {
-  font-size: 0.8rem; /* Smaller font */
+  font-size: 0.8rem;
   color: #666;
   margin-bottom: 0.2rem;
 }
@@ -110,42 +110,40 @@ body {
 .account-info p, .network-info p {
   font-weight: bold;
   color: #333;
-  font-size: 0.9rem; /* Smaller font */
+  font-size: 0.9rem;
 }
 
 .connect-button {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  padding: 0.8rem 1.5rem; /* Reduced padding */
-  border-radius: 40px; /* Smaller radius */
-  font-size: 0.95rem; /* Smaller font */
+  padding: 0.8rem 1.5rem;
+  border-radius: 40px;
+  font-size: 0.95rem;
   font-weight: bold;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
-  margin-top: 0.8rem; /* Reduced margin */
+  margin-top: 0.8rem;
   width: 100%;
 }
 
 .connect-button:hover {
-  transform: translateY(-1px); /* Smaller hover effect */
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* Smaller shadow */
+  transform: translateY(-1px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 }
 
-/* Your Balance heading - smaller */
 .card h2 {
-  font-size: 1.2rem; /* Smaller font */
+  font-size: 1.2rem;
   text-align: center;
-  margin-bottom: 0.8rem; /* Reduced margin */
+  margin-bottom: 0.8rem;
   color: #333;
 }
 
-/* Balance amount - smaller */
 .balance-amount {
-  font-size: 1.4rem; /* Smaller font */
+  font-size: 1.4rem;
   font-weight: bold;
   text-align: center;
-  margin: 1rem 0; /* Reduced margin */
+  margin: 1rem 0;
   color: #333;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
@@ -157,13 +155,13 @@ body {
   background: #6200ea;
   color: white;
   border: none;
-  padding: 0.6rem 1.2rem; /* Reduced padding */
-  border-radius: 40px; /* Smaller radius */
+  padding: 0.6rem 1.2rem;
+  border-radius: 40px;
   font-weight: bold;
-  cursor: pointer;
+  cursor: button;
   transition: background 0.2s;
   width: 100%;
-  font-size: 0.9rem; /* Smaller font */
+  font-size: 0.9rem;
 }
 
 .refresh-button:hover, .mint-button:hover, .transfer-button:hover {
@@ -175,40 +173,38 @@ body {
   cursor: not-allowed;
 }
 
-/* Input groups with labels */
 .input-group {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem; /* Reduced gap */
-  margin-bottom: 0.8rem; /* Reduced margin */
+  gap: 0.4rem;
+  margin-bottom: 0.8rem;
 }
 
 .input-group label {
   font-weight: bold;
-  font-size: 0.8rem; /* Smaller font */
+  font-size: 0.8rem;
   color: #666;
 }
 
-/* Transfer and Mint sections */
 .transfer-section {
-  border-left: 3px solid #4caf50; /* Thinner border */
+  border-left: 3px solid #4caf50;
 }
 
 .mint-section {
-  border-left: 3px solid #ff9800; /* Thinner border */
+  border-left: 3px solid #ff9800;
 }
 
 .mint-controls, .transfer-controls {
   display: flex;
   flex-direction: column;
-  gap: 0.8rem; /* Reduced gap */
+  gap: 0.8rem;
 }
 
 .mint-input, .transfer-input, .transfer-amount-input {
-  padding: 0.6rem; /* Reduced padding */
+  padding: 0.6rem;
   border: 2px solid #ddd;
-  border-radius: 8px; /* Smaller radius */
-  font-size: 0.9rem; /* Smaller font */
+  border-radius: 8px;
+  font-size: 0.9rem;
   width: 100%;
 }
 
@@ -220,75 +216,75 @@ body {
 .info-grid {
   display: grid;
   grid-template-columns: 1fr 2fr;
-  gap: 0.8rem; /* Reduced gap */
+  gap: 0.8rem;
 }
 
 .info-item {
   display: flex;
   justify-content: space-between;
-  padding: 0.4rem 0; /* Reduced padding */
+  padding: 0.4rem 0;
   border-bottom: 1px solid #eee;
 }
 
 .info-label {
   font-weight: bold;
   color: #666;
-  font-size: 0.85rem; /* Smaller font */
+  font-size: 0.85rem;
 }
 
 .info-value {
   color: #333;
   font-weight: 500;
-  font-size: 0.85rem; /* Smaller font */
+  font-size: 0.85rem;
 }
 
 .network-alert {
   background: #ffebee;
   color: #c62828;
-  padding: 0.8rem; /* Reduced padding */
-  border-radius: 8px; /* Smaller radius */
-  margin-bottom: 1rem; /* Reduced margin */
+  padding: 0.8rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
   text-align: center;
-  border-left: 3px solid #c62828; /* Thinner border */
+  border-left: 3px solid #c62828;
   width: 100%;
-  font-size: 0.9rem; /* Smaller font */
+  font-size: 0.9rem;
 }
 
 .network-alert button {
   background: #c62828;
   color: white;
   border: none;
-  padding: 0.4rem 0.8rem; /* Reduced padding */
-  border-radius: 4px; /* Smaller radius */
-  margin-top: 0.4rem; /* Reduced margin */
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  margin-top: 0.4rem;
   cursor: pointer;
-  font-size: 0.8rem; /* Smaller font */
+  font-size: 0.8rem;
 }
 
 .error-message {
   background: #ffebee;
   color: #c62828;
-  padding: 0.8rem; /* Reduced padding */
-  border-radius: 8px; /* Smaller radius */
-  margin-top: 0.8rem; /* Reduced margin */
+  padding: 0.8rem;
+  border-radius: 8px;
+  margin-top: 0.8rem;
   text-align: center;
   width: 100%;
   position: relative;
-  font-size: 0.9rem; /* Smaller font */
+  font-size: 0.9rem;
 }
 
 .dismiss-error {
   position: absolute;
-  right: 0.6rem; /* Adjusted position */
-  top: 0.6rem; /* Adjusted position */
+  right: 0.6rem;
+  top: 0.6rem;
   background: none;
   border: none;
-  font-size: 1.2rem; /* Slightly smaller */
+  font-size: 1.2rem;
   color: #c62828;
   cursor: pointer;
   padding: 0;
-  width: 20px; /* Smaller */
-  height: 20px; /* Smaller */
+  width: 20px;
+  height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -298,11 +294,11 @@ body {
   background: rgba(0, 0, 0, 0.2);
   color: white;
   text-align: center;
-  padding: 0.8rem; /* Reduced padding */
-  margin-top: 1.5rem; /* Reduced margin */
-  border-radius: 8px; /* Smaller radius */
+  padding: 0.8rem;
+  margin-top: 1.5rem;
+  border-radius: 8px;
   width: 100%;
-  font-size: 0.85rem; /* Smaller font */
+  font-size: 0.85rem;
 }
 
 .dashboard {
@@ -312,17 +308,16 @@ body {
   align-items: center;
 }
 
-/* Loading spinner */
 .button-loading {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem; /* Reduced gap */
+  gap: 0.4rem;
 }
 
 .spinner {
-  width: 14px; /* Smaller */
-  height: 14px; /* Smaller */
+  width: 14px;
+  height: 14px;
   border: 2px solid #ffffff;
   border-top: 2px solid transparent;
   border-radius: 50%;
@@ -334,14 +329,13 @@ body {
   100% { transform: rotate(360deg); }
 }
 
-/* Status messages */
 .status-message {
-  padding: 0.6rem; /* Reduced padding */
-  border-radius: 6px; /* Smaller radius */
-  margin-top: 0.8rem; /* Reduced margin */
+  padding: 0.6rem;
+  border-radius: 6px;
+  margin-top: 0.8rem;
   text-align: center;
   font-weight: 500;
-  font-size: 0.85rem; /* Smaller font */
+  font-size: 0.85rem;
 }
 
 .status-message.success {
@@ -356,7 +350,6 @@ body {
   border: 1px solid #ffcdd2;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   body {
     padding: 10px;
