@@ -113,8 +113,16 @@ body {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
+/* Your Balance heading - 25% smaller */
+.card h2 {
+  font-size: 1.5rem; /* Reduced from approx 2rem */
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+/* Balance amount - 40% smaller */
 .balance-amount {
-  font-size: 3rem;
+  font-size: 1.8rem; /* Reduced from 3rem */
   font-weight: bold;
   text-align: center;
   margin: 1.5rem 0;
@@ -143,6 +151,12 @@ body {
 .refresh-button:disabled, .mint-button:disabled {
   background: #ccc;
   cursor: not-allowed;
+}
+
+/* Mint Tokens heading - 20% smaller */
+.mint-section h2 {
+  font-size: 1.6rem; /* Reduced from approx 2rem */
+  margin-bottom: 1rem;
 }
 
 .mint-section {
@@ -175,6 +189,12 @@ body {
   border-radius: 10px;
   background: #e8f5e8;
   color: #2e7d32;
+}
+
+/* Token Information heading - 20% smaller */
+.info-grid h2 {
+  font-size: 1.6rem; /* Reduced from approx 2rem */
+  margin-bottom: 1rem;
 }
 
 .info-grid {
@@ -251,6 +271,18 @@ body {
   }
   
   .balance-amount {
-    font-size: 2rem;
+    font-size: 1.4rem; /* Adjusted for mobile */
+  }
+  
+  .card h2 {
+    font-size: 1.3rem; /* Adjusted for mobile */
+  }
+  
+  .mint-section h2 {
+    font-size: 1.4rem; /* Adjusted for mobile */
+  }
+  
+  .info-grid h2 {
+    font-size: 1.4rem; /* Adjusted for mobile */
   }
 }
