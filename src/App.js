@@ -17,7 +17,6 @@ function App() {
     transferTokens,
     isOwner,
     contractAddress,
-    transactionHistory,
     clearError
   } = useWeb3();
   
@@ -76,10 +75,6 @@ function App() {
   const shortenContractAddress = (address) => {
     if (!address) return '';
     return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
-  };
-
-  const formatTransactionHash = (hash) => {
-    return `${hash.substring(0, 8)}...${hash.substring(hash.length - 6)}`;
   };
 
   return (
@@ -221,29 +216,6 @@ function App() {
                     {mintStatus}
                   </div>
                 )}
-              </div>
-            )}
-
-            {/* Transaction History */}
-            {transactionHistory.length > 0 && (
-              <div className="card transaction-section">
-                <h2>Recent Transactions</h2>
-                <div className="transaction-list">
-                  {transactionHistory.slice(0, 5).map((tx, index) => (
-                    <div key={index} className="transaction-item">
-                      <div className="transaction-type">{tx.type}</div>
-                      <div className="transaction-hash">
-                        {formatTransactionHash(tx.hash)}
-                      </div>
-                      <div className="transaction-amount">
-                        {tx.amount} {tokenSymbol}
-                      </div>
-                      <div className="transaction-date">
-                        {new Date(tx.timestamp).toLocaleTimeString()}
-                      </div>
-                    </div>
-                  ))}
-                </div>
               </div>
             )}
 
