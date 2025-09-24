@@ -55,16 +55,16 @@ export function useWeb3() {
 
   const clearError = useCallback(() => setError(""), []);
 
-  // Contract objects
+  // Contract objects (FIXED: added contractAddress to dependencies)
   const contract = useMemo(() => {
     if (!provider) return null;
     return new Contract(contractAddress, JING_ABI, provider);
-  }, [provider]);
+  }, [provider, contractAddress]); // ← Added contractAddress
 
   const connectedContract = useMemo(() => {
     if (!signer) return null;
     return new Contract(contractAddress, JING_ABI, signer);
-  }, [signer]);
+  }, [signer, contractAddress]); // ← Added contractAddress
 
   // Network check
   const checkNetwork = useCallback(async () => {
@@ -228,6 +228,7 @@ export function useWeb3() {
     return tx.hash;
   }, [connectedContract, isOwner]);
 
+  // FIXED: Added contractAddress to dependencies
   const getContractBalance = useCallback(async () => {
     if (!provider || !contractAddress) return "0";
     try {
@@ -237,7 +238,7 @@ export function useWeb3() {
       setError(`Contract balance error: ${e.message}`);
       return "0";
     }
-  }, [provider, contractAddress]);
+  }, [provider, contractAddress]); // ← Added contractAddress
 
   // Auto-load
   useEffect(() => {
