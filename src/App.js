@@ -181,6 +181,18 @@ function App() {
                     1 ETH = {Number(ratePerEth).toLocaleString()} {tokenSymbol}
                   </div>
                 </div>
+
+                {/* Account Status */}
+                <div className="info-item">
+                  <div className="info-label">Account Status</div>
+                  <div className="info-value">
+                    {isOwner ? (
+                      <span className="owner-badge">👑 Owner Account</span>
+                    ) : (
+                      <span className="user-badge">👤 User Account</span>
+                    )}
+                  </div>
+                </div>
               </div>
               
               <div className="action-group">
@@ -325,48 +337,9 @@ function App() {
                   </div>
                 </>
               )}
-
-              {/* Token Information */}
-              <div className="info-card">
-                <div className="section-header">
-                  <span>📊</span>
-                  <h3>Token Information</h3>
-                </div>
-                <div className="info-grid">
-                  <div className="info-item">
-                    <div className="info-label">Contract Address</div>
-                    <div 
-                      className="info-value copyable-address" 
-                      onClick={() => copyToClipboard('0x15c12f6854c88175d2cd1448ffcf668be61cf4aa')}
-                    >
-                      0x15c12...f4aa
-                      <span className="copy-icon">📋</span>
-                    </div>
-                  </div>
-                  <div className="info-item">
-                    <div className="info-label">Total Supply</div>
-                    <div className="info-value">{Number(totalSupply).toLocaleString()} {tokenSymbol}</div>
-                  </div>
-                </div>
-              </div>
             </div>
 
-            {/* Account Status - Centered at Bottom */}
-            <div className="status-section">
-              <div className="status-card">
-                <div className="section-header">
-                  <span>👤</span>
-                  <h3>Account Status</h3>
-                </div>
-                <div className="status-badge-container">
-                  {isOwner ? (
-                    <span className="owner-badge-large">👑 Owner Account</span>
-                  ) : (
-                    <span className="user-badge-large">👤 User Account</span>
-                  )}
-                </div>
-              </div>
-            </div>
+            {/* REMOVED: The entire bottom section that was displaying duplicate Token Information */}
           </div>
         )}
 
