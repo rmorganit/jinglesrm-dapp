@@ -11,7 +11,6 @@ import {
 
 // Ethereum Mainnet
 const MAINNET_CHAIN_ID_HEX = "0x1";
-const MAINNET_RPC_FALLBACK = "https://eth-mainnet.g.alchemy.com/v2/qDGrM1Ww_-k8YtrAHwJGU1iwTT960GK8";
 
 // Contract address
 const CONTRACT_ADDRESS = "0x15c12f6854c88175d2cd1448ffcf668be61cf4aa";
@@ -38,7 +37,6 @@ export function useWeb3() {
   const [provider, setProvider] = useState(null);
   const [signer, setSigner] = useState(null);
   const [account, setAccount] = useState("");
-  const [isCorrectNetwork, setIsCorrectNetwork] = useState(false);
   const [error, setError] = useState("");
 
   const [tokenSymbol, setTokenSymbol] = useState("JINGRM");
@@ -74,12 +72,13 @@ export function useWeb3() {
 
   // Network check
   const checkNetwork = useCallback(async () => {
-    if (!window.ethereum) return setIsCorrectNetwork(false);
+    if (!window.ethereum) return false;
     try {
       const chainId = await window.ethereum.request({ method: "eth_chainId" });
-      setIsCorrectNetwork(chainId === MAINNET_CHAIN_ID_HEX);
+      return chainId === MAINNET_CHAIN_ID_HEX;
     } catch (e) {
       console.error("Network check error:", e);
+      return false;
     }
   }, []);
 
