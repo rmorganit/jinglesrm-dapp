@@ -13,7 +13,6 @@ function App() {
     isOwner,
     connectWallet,
     refreshBalance,
-    mintTokens,
     transferTokens,
     buyTokens,
     setNewTokenPrice,
@@ -24,7 +23,6 @@ function App() {
 
   const [transferTo, setTransferTo] = useState("");
   const [transferAmount, setTransferAmount] = useState("");
-  const [mintAmount, setMintAmount] = useState("");
   const [buyAmount, setBuyAmount] = useState("");
   const [newPrice, setNewPrice] = useState("");
 
@@ -33,20 +31,6 @@ function App() {
       setTimeout(() => clearError(), 5000);
     }
   }, [error, clearError]);
-
-  const handleMint = async () => {
-    if (!mintAmount) {
-      alert("Please enter an amount to mint");
-      return;
-    }
-    try {
-      await mintTokens(mintAmount);
-      setMintAmount("");
-      alert("🎉 Tokens minted successfully!");
-    } catch (err) {
-      alert("❌ Mint failed: " + err.message);
-    }
-  };
 
   const handleTransfer = async () => {
     if (!transferTo || !transferAmount) {
@@ -100,6 +84,36 @@ function App() {
         alert("❌ Withdrawal failed: " + err.message);
       }
     }
+  };
+
+  const handleImportToken = () => {
+    if (window.ethereum) {
+      window.ethereum.request({
+        method: 'wallet_watchAsset',
+        params: {
+          type: 'ERC20',
+          options: {
+            address: '0x15c12f6854c88175d2cd1448ffcf668be61cf4aa',
+            symbol: tokenSymbol,
+            decimals: 18,
+            image: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x15c12f6854c88175d2cd1448ffcf668be61cf4aa/logo.png'
+          },
+        },
+      }).then((success) => {
+        if (success) {
+          alert('✅ Token imported successfully to your wallet!');
+        } else {
+          alert('❌ Token import cancelled or failed');
+        }
+      }).catch(console.error);
+    } else {
+      alert('Please install MetaMask or another Web3 wallet');
+    }
+  };
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    alert('Contract address copied to clipboard!');
   };
 
   return (
@@ -232,29 +246,48 @@ function App() {
                 </div>
               </div>
 
+              {/* Import Token Section */}
+              <div className="transaction-section">
+                <div className="section-header">
+                  <span>📥</span>
+                  <h3>Import {tokenSymbol} Token</h3>
+                </div>
+                <div className="info-grid">
+                  <div className="info-item">
+                    <div className="info-label">Contract Address</div>
+                    <div 
+                      className="info-value copyable-address" 
+                      onClick={() => copyToClipboard('0x15c12f6854c88175d2cd1448ffcf668be61cf4aa')}
+                    >
+                      0x15c12...f4aa
+                      <span className="copy-icon">📋</span>
+                    </div>
+                  </div>
+                  <div className="info-item">
+                    <div className="info-label">Token Symbol</div>
+                    <div className="info-value">{tokenSymbol}</div>
+                  </div>
+                  <div className="info-item">
+                    <div className="info-label">Decimals</div>
+                    <div className="info-value">18</div>
+                  </div>
+                </div>
+                <div className="action-group">
+                  <button 
+                    className="action-button import-button" 
+                    onClick={handleImportToken}
+                  >
+                    📥 Import {tokenSymbol} to Wallet
+                  </button>
+                </div>
+                <div className="rate-display">
+                  <p>💡 <strong>Tip:</strong> This adds {tokenSymbol} to your wallet's token list for easy tracking</p>
+                </div>
+              </div>
+
               {/* Owner Controls */}
               {isOwner && (
                 <>
-                  {/* Mint Tokens */}
-                  <div className="transaction-section owner-section">
-                    <div className="section-header">
-                      <span>🏭</span>
-                      <h3>Mint Tokens (Owner Only)</h3>
-                    </div>
-                    <div className="input-group">
-                      <input
-                        type="number"
-                        placeholder="Amount to Mint"
-                        value={mintAmount}
-                        onChange={(e) => setMintAmount(e.target.value)}
-                        className="input-field"
-                      />
-                      <button className="action-button" onClick={handleMint}>
-                        Mint {tokenSymbol}
-                      </button>
-                    </div>
-                  </div>
-
                   {/* Price Management */}
                   <div className="transaction-section owner-section">
                     <div className="section-header">
@@ -302,7 +335,13 @@ function App() {
                 <div className="info-grid">
                   <div className="info-item">
                     <div className="info-label">Contract Address</div>
-                    <div className="info-value">0x15c12...f4aa</div>
+                    <div 
+                      className="info-value copyable-address" 
+                      onClick={() => copyToClipboard('0x15c12f6854c88175d2cd1448ffcf668be61cf4aa')}
+                    >
+                      0x15c12...f4aa
+                      <span className="copy-icon">📋</span>
+                    </div>
                   </div>
                   <div className="info-item">
                     <div className="info-label">Total Supply</div>
