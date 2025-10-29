@@ -163,36 +163,36 @@ function App() {
 
             {/* Main Content Card */}
             <div className="info-card">
-              {/* Section Tabs */}
+              {/* Section Tabs - REMOVED "BUY JINGRM" from top tab */}
               <div className="section-tabs">
                 <button 
                   className={`section-tab ${activeSection === 'buy' ? 'active' : ''}`}
                   onClick={() => setActiveSection('buy')}
                 >
-                  🛒 BUY JINGRM
+                  🛒 BUY TOKENS
                 </button>
                 <button 
                   className={`section-tab ${activeSection === 'about' ? 'active' : ''}`}
                   onClick={() => setActiveSection('about')}
                 >
-                  ℹ️ ABOUT JINGRM
+                  ℹ️ ABOUT
                 </button>
               </div>
 
               {/* Buy Section */}
               {activeSection === 'buy' && (
                 <div className="section-content">
-                  <h2>Buy JINGRM Tokens</h2>
+                  <h2>Buy {tokenSymbol} Tokens</h2>
                   
                   {/* Price and Rate Info at the Top */}
                   <div className="price-rate-section">
                     <div className="price-item">
                       <span className="price-label">💰 Price:</span>
-                      <span className="price-value">{tokenPriceEth} ETH / JINGRM</span>
+                      <span className="price-value">{tokenPriceEth} ETH / {tokenSymbol}</span>
                     </div>
                     <div className="rate-item">
                       <span className="rate-label">📊 Rate:</span>
-                      <span className="rate-value">1 ETH ≈ {Number(ratePerEth).toLocaleString()} JINGRM</span>
+                      <span className="rate-value">1 ETH ≈ {Number(ratePerEth).toLocaleString()} {tokenSymbol}</span>
                     </div>
                   </div>
 
@@ -212,7 +212,17 @@ function App() {
                     </div>
                   </div>
 
-                  {/* Buy Section */}
+                  {/* REORDERED BUTTONS: Import Wallet, Refresh Balance, then Buy JINGRM */}
+                  <div className="action-buttons-row">
+                    <button className="action-button import-button compact" onClick={handleImportToken}>
+                      📥 Import to Wallet
+                    </button>
+                    <button className="action-button refresh-button compact" onClick={handleRefreshBalance}>
+                      🔄 Refresh Balance
+                    </button>
+                  </div>
+
+                  {/* Buy Section - Moved below the reordered buttons */}
                   <div className="buy-section">
                     <div className="buy-input-group">
                       <input
@@ -229,23 +239,14 @@ function App() {
                     </div>
                   </div>
 
-                  <div className="action-buttons-row">
-                    <button className="action-button refresh-button compact" onClick={handleRefreshBalance}>
-                      🔄 Refresh Balance
-                    </button>
-                    <button className="action-button import-button compact" onClick={handleImportToken}>
-                      📥 Import to Wallet
-                    </button>
-                  </div>
-
-                  {/* Token Import Info Section */}
+                  {/* Token Import Info Section - Enhanced with copy functionality */}
                   <div className="import-info-section">
                     <h4>Token Information</h4>
                     <div className="import-info-grid">
                       <div className="import-info-item">
                         <span className="import-label">Contract:</span>
-                        <span className="import-value" onClick={copyToClipboard}>
-                          0x15c12...f4aa
+                        <span className="import-value copyable" onClick={copyToClipboard}>
+                          0x15c12...f4aa 📋
                         </span>
                       </div>
                       <div className="import-info-item">
@@ -264,18 +265,18 @@ function App() {
               {/* About Section */}
               {activeSection === 'about' && (
                 <div className="section-content">
-                  <h2>About JINGRM</h2>
+                  <h2>About {tokenSymbol}</h2>
                   
                   <div className="about-content">
                     <div className="about-section">
-                      <h3>What is JINGRM?</h3>
-                      <p>JINGRM (Jing Real Money) is a utility token built on Ethereum Mainnet, designed to facilitate secure, transparent transactions across digital ecosystems.</p>
+                      <h3>What is {tokenSymbol}?</h3>
+                      <p>{tokenSymbol} (Jing Real Money) is a utility token built on Ethereum Mainnet, designed to facilitate secure, transparent transactions across digital ecosystems.</p>
                     </div>
 
                     <div className="about-section">
                       <h3>Key Features</h3>
                       <ul className="features-list">
-                        <li>🎯 <strong>Fixed Pricing:</strong> 1 ETH = 1,000 JINGRM</li>
+                        <li>🎯 <strong>Fixed Pricing:</strong> 1 ETH = 1,000 {tokenSymbol}</li>
                         <li>🔒 <strong>Ethereum Security:</strong> Built on Mainnet</li>
                         <li>💼 <strong>Real Utility:</strong> Powers services and transactions</li>
                         <li>🌍 <strong>Easy Access:</strong> No technical expertise required</li>

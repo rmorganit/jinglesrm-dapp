@@ -222,7 +222,7 @@
 }
 
 .buy-section {
-  margin: 15px 0;
+  margin: 20px 0 15px 0;
 }
 
 .buy-input-group {
@@ -277,7 +277,8 @@
   display: flex;
   gap: 10px;
   justify-content: center;
-  margin-top: 15px;
+  margin: 15px 0;
+  flex-wrap: wrap;
 }
 
 .action-button {
@@ -293,9 +294,15 @@
 }
 
 .action-button.compact {
-  padding: 8px 14px;
-  font-size: 0.75em;
-  min-width: 120px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.8em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+  min-width: 140px;
 }
 
 .action-button:disabled {
@@ -412,6 +419,23 @@
 
 .import-value:hover {
   color: #667eea;
+}
+
+/* Enhanced copyable contract address */
+.import-value.copyable {
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: rgba(102, 126, 234, 0.1);
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.import-value.copyable:hover {
+  background: rgba(102, 126, 234, 0.2);
+  transform: translateY(-1px);
 }
 
 .about-content {
@@ -621,5 +645,21 @@
     flex-direction: column;
     gap: 2px;
     text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .action-buttons-row {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .action-button.compact {
+    width: 100%;
+    max-width: 200px;
+  }
+  
+  .import-value.copyable {
+    font-size: 0.75em;
   }
 }
