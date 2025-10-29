@@ -27,6 +27,9 @@ function App() {
   const [buyAmount, setBuyAmount] = useState("");
   const [newPrice, setNewPrice] = useState("");
   const [activeSection, setActiveSection] = useState("buy");
+  const [loading, setLoading] = useState(false);
+  const [transactionStatus, setTransactionStatus] = useState("");
+  const [currentAction, setCurrentAction] = useState("");
 
   useEffect(() => {
     if (error) {
@@ -34,104 +37,153 @@ function App() {
     }
   }, [error, clearError]);
 
+  const showStatus = (message, type = "success") => {
+    setTransactionStatus({ message, type });
+    setTimeout(() => setTransactionStatus(""), 4000);
+  };
+
   const handleTransfer = async () => {
     if (!transferTo || !transferAmount) {
-      alert("Please enter recipient and amount");
+      showStatus("Please enter recipient address and amount", "error");
       return;
     }
+    
+    setLoading(true);
+    setCurrentAction("transfer");
     try {
       await transferTokens(transferTo, transferAmount);
       setTransferTo("");
       setTransferAmount("");
-      alert("✅ Transfer successful!");
+      showStatus(`✅ Successfully transferred ${transferAmount} ${tokenSymbol} to ${transferTo.slice(0, 8)}...`);
     } catch (err) {
-      alert("❌ Transfer failed: " + err.message);
+      showStatus(`❌ Transfer failed: ${err.message}`, "error");
+    } finally {
+      setLoading(false);
+      setCurrentAction("");
     }
   };
 
   const handleBuy = async () => {
-    if (!buyAmount) {
-      alert("Please enter ETH amount");
+    if (!buyAmount || parseFloat(buyAmount) <= 0) {
+      showStatus("Please enter a valid ETH amount to buy tokens", "error");
       return;
     }
+    
+    setLoading(true);
+    setCurrentAction("buy");
     try {
+      const estimatedTokens = (buyAmount * ratePerEth).toLocaleString();
       await buyTokens(buyAmount);
       setBuyAmount("");
-      // Force refresh balance after purchase
-      await refreshBalance();
-      alert("🛒 Tokens purchased successfully!");
+      showStatus(`✅ Success! Purchased ≈${estimatedTokens} ${tokenSymbol} for ${buyAmount} ETH`);
     } catch (err) {
-      alert("❌ Buy failed: " + err.message);
+      showStatus(`❌ Purchase failed: ${err.message}`, "error");
+    } finally {
+      setLoading(false);
+      setCurrentAction("");
     }
   };
 
   const handleSetPrice = async () => {
     if (!newPrice) {
-      alert("Please enter new price");
+      showStatus("Please enter a new token price", "error");
       return;
     }
+    
+    setLoading(true);
+    setCurrentAction("setPrice");
     try {
       await setNewTokenPrice(newPrice);
       setNewPrice("");
-      alert("💰 Price updated successfully!");
+      showStatus(`✅ Token price updated to ${newPrice} ETH per ${tokenSymbol}`);
     } catch (err) {
-      alert("❌ Price update failed: " + err.message);
+      showStatus(`❌ Price update failed: ${err.message}`, "error");
+    } finally {
+      setLoading(false);
+      setCurrentAction("");
     }
   };
 
   const handleWithdraw = async () => {
-    if (window.confirm("Are you sure you want to withdraw ETH from the contract?")) {
-      try {
-        await withdrawETH();
-        alert("💸 ETH withdrawn successfully!");
-      } catch (err) {
-        alert("❌ Withdrawal failed: " + err.message);
-      }
+    if (parseFloat(contractBalance) === 0) {
+      showStatus("Contract has no ETH to withdraw", "error");
+      return;
+    }
+    
+    setLoading(true);
+    setCurrentAction("withdraw");
+    try {
+      await withdrawETH();
+      showStatus(`✅ Successfully withdrew ${contractBalance} ETH from contract`);
+    } catch (err) {
+      showStatus(`❌ Withdrawal failed: ${err.message}`, "error");
+    } finally {
+      setLoading(false);
+      setCurrentAction("");
     }
   };
 
   const handleImportToken = async () => {
-    if (window.ethereum) {
-      try {
-        const success = await window.ethereum.request({
-          method: 'wallet_watchAsset',
-          params: {
-            type: 'ERC20',
-            options: {
-              address: '0x15c12f6854c88175d2cd1448ffcf668be61cf4aa',
-              symbol: tokenSymbol,
-              decimals: 18,
-              image: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x15c12f6854c88175d2cd1448ffcf668be61cf4aa/logo.png'
-            },
+    setLoading(true);
+    setCurrentAction("import");
+    try {
+      const success = await window.ethereum.request({
+        method: 'wallet_watchAsset',
+        params: {
+          type: 'ERC20',
+          options: {
+            address: '0x15c12f6854c88175d2cd1448ffcf668be61cf4aa',
+            symbol: tokenSymbol,
+            decimals: 18,
           },
-        });
-        
-        if (success) {
-          alert('✅ Token imported successfully to your wallet!');
-        } else {
-          alert('❌ Token import cancelled or failed');
-        }
-      } catch (err) {
-        console.error('Import token error:', err);
-        alert('❌ Token import failed: ' + err.message);
+        },
+      });
+      
+      if (success) {
+        showStatus('✅ Token successfully added to your wallet!');
+      } else {
+        showStatus('Token import was cancelled', "info");
       }
-    } else {
-      alert('Please install MetaMask or another Web3 wallet');
+    } catch (err) {
+      showStatus(`❌ Import failed: ${err.message}`, "error");
+    } finally {
+      setLoading(false);
+      setCurrentAction("");
     }
   };
 
   const handleRefreshBalance = async () => {
+    setLoading(true);
+    setCurrentAction("refresh");
     try {
       await refreshBalance();
-      alert("✅ Balance refreshed!");
+      showStatus("✅ Balance updated successfully!");
     } catch (err) {
-      alert("❌ Refresh failed: " + err.message);
+      showStatus(`❌ Refresh failed: ${err.message}`, "error");
+    } finally {
+      setLoading(false);
+      setCurrentAction("");
     }
   };
 
-  const copyToClipboard = (text) => {
+  const copyToClipboard = () => {
     navigator.clipboard.writeText('0x15c12f6854c88175d2cd1448ffcf668be61cf4aa');
-    alert('Contract address copied to clipboard!');
+    showStatus("📋 Contract address copied to clipboard!");
+  };
+
+  const getButtonText = (action, defaultText) => {
+    if (loading && currentAction === action) {
+      switch (action) {
+        case "buy": return "🛒 Buying...";
+        case "transfer": return "⏳ Sending...";
+        case "refresh": return "🔄 Refreshing...";
+        case "import": return "📥 Importing...";
+        case "setPrice": return "💰 Updating...";
+        case "withdraw": return "💸 Withdrawing...";
+        default: return "⏳ Processing...";
+      }
+    }
+    return defaultText;
   };
 
   return (
@@ -154,28 +206,41 @@ function App() {
           </div>
         ) : (
           <div className="dashboard">
-            {/* Centered Account Status */}
+            {/* Transaction Status Banner */}
+            {transactionStatus && (
+              <div className={`transaction-status ${transactionStatus.type}`}>
+                {transactionStatus.message}
+              </div>
+            )}
+
+            {/* Loading Overlay */}
+            {loading && (
+              <div className="loading-overlay">
+                <div className="loading-spinner"></div>
+                <p>Processing transaction...</p>
+              </div>
+            )}
+
             <div className="account-status-centered">
               <div className={`status-badge-large ${isOwner ? 'owner' : 'user'}`}>
                 {isOwner ? '👑 Owner Account' : '👤 User Account'}
               </div>
             </div>
 
-            {/* Main Content Card */}
             <div className="info-card">
-              {/* Section Tabs - REMOVED "BUY JINGRM" from top tab */}
+              {/* Section Tabs */}
               <div className="section-tabs">
                 <button 
                   className={`section-tab ${activeSection === 'buy' ? 'active' : ''}`}
                   onClick={() => setActiveSection('buy')}
                 >
-                  🛒 BUY TOKENS
+                  🛒 Buy Tokens
                 </button>
                 <button 
                   className={`section-tab ${activeSection === 'about' ? 'active' : ''}`}
                   onClick={() => setActiveSection('about')}
                 >
-                  ℹ️ ABOUT
+                  ℹ️ About JINGRM
                 </button>
               </div>
 
@@ -184,7 +249,7 @@ function App() {
                 <div className="section-content">
                   <h2>Buy {tokenSymbol} Tokens</h2>
                   
-                  {/* Price and Rate Info at the Top */}
+                  {/* Price and Rate Info */}
                   <div className="price-rate-section">
                     <div className="price-item">
                       <span className="price-label">💰 Price:</span>
@@ -192,10 +257,11 @@ function App() {
                     </div>
                     <div className="rate-item">
                       <span className="rate-label">📊 Rate:</span>
-                      <span className="rate-value">1 ETH ≈ {Number(ratePerEth).toLocaleString()} {tokenSymbol}</span>
+                      <span className="rate-value">1 ETH = {Number(ratePerEth).toLocaleString()} {tokenSymbol}</span>
                     </div>
                   </div>
 
+                  {/* Balance Info */}
                   <div className="compact-info-grid">
                     <div className="info-item highlight">
                       <div className="info-label">Your Balance</div>
@@ -203,7 +269,6 @@ function App() {
                         {Number(jingBalance).toLocaleString()} {tokenSymbol}
                       </div>
                     </div>
-                    
                     <div className="info-item">
                       <div className="info-label">Total Supply</div>
                       <div className="info-value">
@@ -212,17 +277,25 @@ function App() {
                     </div>
                   </div>
 
-                  {/* REORDERED BUTTONS: Import Wallet, Refresh Balance, then Buy JINGRM */}
+                  {/* Action Buttons - Import First */}
                   <div className="action-buttons-row">
-                    <button className="action-button import-button compact" onClick={handleImportToken}>
-                      📥 Import to Wallet
+                    <button 
+                      className="action-button import-button compact" 
+                      onClick={handleImportToken}
+                      disabled={loading}
+                    >
+                      {getButtonText("import", "📥 Import to Wallet")}
                     </button>
-                    <button className="action-button refresh-button compact" onClick={handleRefreshBalance}>
-                      🔄 Refresh Balance
+                    <button 
+                      className="action-button refresh-button compact" 
+                      onClick={handleRefreshBalance}
+                      disabled={loading}
+                    >
+                      {getButtonText("refresh", "🔄 Refresh Balance")}
                     </button>
                   </div>
 
-                  {/* Buy Section - Moved below the reordered buttons */}
+                  {/* Buy Section */}
                   <div className="buy-section">
                     <div className="buy-input-group">
                       <input
@@ -232,14 +305,24 @@ function App() {
                         value={buyAmount}
                         onChange={(e) => setBuyAmount(e.target.value)}
                         className="input-field"
+                        disabled={loading}
                       />
-                      <button className="action-button buy-button" onClick={handleBuy}>
-                        🛒 Buy {tokenSymbol}
+                      <button 
+                        className="action-button buy-button" 
+                        onClick={handleBuy}
+                        disabled={loading}
+                      >
+                        {getButtonText("buy", `🛒 Buy ${tokenSymbol}`)}
                       </button>
                     </div>
+                    {buyAmount && parseFloat(buyAmount) > 0 && (
+                      <div className="estimated-amount">
+                        ≈ {(buyAmount * ratePerEth).toLocaleString()} {tokenSymbol}
+                      </div>
+                    )}
                   </div>
 
-                  {/* Token Import Info Section - Enhanced with copy functionality */}
+                  {/* Token Info */}
                   <div className="import-info-section">
                     <h4>Token Information</h4>
                     <div className="import-info-grid">
@@ -265,21 +348,35 @@ function App() {
               {/* About Section */}
               {activeSection === 'about' && (
                 <div className="section-content">
-                  <h2>About {tokenSymbol}</h2>
-                  
                   <div className="about-content">
                     <div className="about-section">
-                      <h3>What is {tokenSymbol}?</h3>
-                      <p>{tokenSymbol} (Jing Real Money) is a utility token built on Ethereum Mainnet, designed to facilitate secure, transparent transactions across digital ecosystems.</p>
+                      <h3>What is JINGRM?</h3>
+                      <p>JINGRM (Jing Real Money) is a utility token built on Ethereum Mainnet, designed for secure digital transactions and ecosystem services.</p>
                     </div>
-
                     <div className="about-section">
-                      <h3>Key Features</h3>
+                      <h3>How to Get Started</h3>
                       <ul className="features-list">
-                        <li>🎯 <strong>Fixed Pricing:</strong> 1 ETH = 1,000 {tokenSymbol}</li>
-                        <li>🔒 <strong>Ethereum Security:</strong> Built on Mainnet</li>
-                        <li>💼 <strong>Real Utility:</strong> Powers services and transactions</li>
-                        <li>🌍 <strong>Easy Access:</strong> No technical expertise required</li>
+                        <li>
+                          <strong>1. Import to Wallet</strong> - Click "Import to Wallet" to add JINGRM to your wallet for easy tracking and management
+                        </li>
+                        <li>
+                          <strong>2. Buy Tokens</strong> - Enter ETH amount and click "Buy JINGRM" to purchase tokens at {tokenPriceEth} ETH each
+                        </li>
+                        <li>
+                          <strong>3. Transfer Tokens</strong> - Send tokens to other addresses using the transfer section
+                        </li>
+                        <li>
+                          <strong>4. Manage Balance</strong> - Click "Refresh Balance" to see your latest token amounts
+                        </li>
+                      </ul>
+                    </div>
+                    <div className="about-section">
+                      <h3>Token Details</h3>
+                      <ul className="features-list">
+                        <li>💰 <strong>Fixed Price:</strong> {tokenPriceEth} ETH per JINGRM</li>
+                        <li>📊 <strong>Exchange Rate:</strong> 1 ETH = {Number(ratePerEth).toLocaleString()} JINGRM</li>
+                        <li>🔗 <strong>Network:</strong> Ethereum Mainnet</li>
+                        <li>🛡️ <strong>Security:</strong> Fully audited smart contract</li>
                       </ul>
                     </div>
                   </div>
@@ -287,10 +384,9 @@ function App() {
               )}
             </div>
 
-            {/* Always visible actions */}
+            {/* Transfer Section */}
             <div className="actions-section">
               <h3>Token Transfer</h3>
-              
               <div className="transaction-section">
                 <div className="input-group">
                   <input
@@ -299,6 +395,7 @@ function App() {
                     value={transferTo}
                     onChange={(e) => setTransferTo(e.target.value)}
                     className="input-field"
+                    disabled={loading}
                   />
                   <input
                     type="number"
@@ -306,39 +403,51 @@ function App() {
                     value={transferAmount}
                     onChange={(e) => setTransferAmount(e.target.value)}
                     className="input-field"
+                    disabled={loading}
                   />
-                  <button className="action-button transfer-button" onClick={handleTransfer}>
-                    Transfer
+                  <button 
+                    className="action-button transfer-button" 
+                    onClick={handleTransfer}
+                    disabled={loading}
+                  >
+                    {getButtonText("transfer", "Transfer")}
                   </button>
                 </div>
               </div>
 
               {isOwner && (
-                <>
-                  <div className="transaction-section owner-section">
-                    <h3>Owner Controls</h3>
-                    <div className="input-group">
-                      <input
-                        type="number"
-                        step="0.0001"
-                        placeholder="New price in ETH"
-                        value={newPrice}
-                        onChange={(e) => setNewPrice(e.target.value)}
-                        className="input-field"
-                      />
-                      <button className="action-button price-button" onClick={handleSetPrice}>
-                        Update Price
-                      </button>
-                    </div>
-                    
-                    <div className="contract-balance">
-                      <span>Contract Balance: {contractBalance} ETH</span>
-                      <button className="action-button withdraw-button" onClick={handleWithdraw}>
-                        Withdraw ETH
-                      </button>
-                    </div>
+                <div className="transaction-section owner-section">
+                  <h3>Owner Controls</h3>
+                  <div className="input-group">
+                    <input
+                      type="number"
+                      step="0.0001"
+                      placeholder="New price in ETH"
+                      value={newPrice}
+                      onChange={(e) => setNewPrice(e.target.value)}
+                      className="input-field"
+                      disabled={loading}
+                    />
+                    <button 
+                      className="action-button price-button" 
+                      onClick={handleSetPrice}
+                      disabled={loading}
+                    >
+                      {getButtonText("setPrice", "Update Price")}
+                    </button>
                   </div>
-                </>
+                  
+                  <div className="contract-balance">
+                    <span>Contract Balance: {contractBalance} ETH</span>
+                    <button 
+                      className="action-button withdraw-button" 
+                      onClick={handleWithdraw}
+                      disabled={loading || parseFloat(contractBalance) === 0}
+                    >
+                      {getButtonText("withdraw", "Withdraw ETH")}
+                    </button>
+                  </div>
+                </div>
               )}
             </div>
           </div>

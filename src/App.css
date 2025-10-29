@@ -221,8 +221,9 @@
   letter-spacing: 0.5px;
 }
 
+/* Buy Section */
 .buy-section {
-  margin: 20px 0 15px 0;
+  margin: 20px 0;
 }
 
 .buy-input-group {
@@ -263,7 +264,7 @@
   color: white;
 }
 
-.buy-input-group .buy-button:hover {
+.buy-input-group .buy-button:hover:not(:disabled) {
   background: linear-gradient(135deg, #218838, #1e9e8a);
   transform: translateY(-1px);
   box-shadow: 0 3px 10px rgba(40, 167, 69, 0.3);
@@ -273,12 +274,29 @@
   transform: translateY(0);
 }
 
+.estimated-amount {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 0.9em;
+  color: #28a745;
+  font-weight: 600;
+  background: rgba(40, 167, 69, 0.1);
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(40, 167, 69, 0.2);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .action-buttons-row {
   display: flex;
   gap: 10px;
   justify-content: center;
-  margin: 15px 0;
-  flex-wrap: wrap;
+  margin-top: 15px;
 }
 
 .action-button {
@@ -294,21 +312,16 @@
 }
 
 .action-button.compact {
-  padding: 10px 16px;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.8em;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  color: white;
-  min-width: 140px;
+  padding: 8px 14px;
+  font-size: 0.75em;
+  min-width: 120px;
 }
 
 .action-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none !important;
+  box-shadow: none !important;
 }
 
 .action-button:active {
@@ -320,7 +333,7 @@
   background: linear-gradient(135deg, #17a2b8, #138496);
 }
 
-.action-button.refresh-button:hover {
+.action-button.refresh-button:hover:not(:disabled) {
   background: linear-gradient(135deg, #138496, #117a8b);
   transform: translateY(-1px);
   box-shadow: 0 3px 10px rgba(23, 162, 184, 0.3);
@@ -330,7 +343,7 @@
   background: linear-gradient(135deg, #6f42c1, #5a2d9c);
 }
 
-.action-button.import-button:hover {
+.action-button.import-button:hover:not(:disabled) {
   background: linear-gradient(135deg, #5a2d9c, #4a2580);
   transform: translateY(-1px);
   box-shadow: 0 3px 10px rgba(111, 66, 193, 0.3);
@@ -340,7 +353,7 @@
   background: linear-gradient(135deg, #007bff, #0056b3);
 }
 
-.action-button.transfer-button:hover {
+.action-button.transfer-button:hover:not(:disabled) {
   background: linear-gradient(135deg, #0056b3, #004085);
   transform: translateY(-1px);
   box-shadow: 0 3px 10px rgba(0, 123, 255, 0.3);
@@ -350,7 +363,7 @@
   background: linear-gradient(135deg, #fd7e14, #e55a00);
 }
 
-.action-button.price-button:hover {
+.action-button.price-button:hover:not(:disabled) {
   background: linear-gradient(135deg, #e55a00, #cc4c00);
   transform: translateY(-1px);
   box-shadow: 0 3px 10px rgba(253, 126, 20, 0.3);
@@ -360,7 +373,7 @@
   background: linear-gradient(135deg, #dc3545, #c82333);
 }
 
-.action-button.withdraw-button:hover {
+.action-button.withdraw-button:hover:not(:disabled) {
   background: linear-gradient(135deg, #c82333, #a71e2a);
   transform: translateY(-1px);
   box-shadow: 0 3px 10px rgba(220, 53, 69, 0.3);
@@ -438,20 +451,30 @@
   transform: translateY(-1px);
 }
 
+/* About Section */
 .about-content {
   text-align: left;
 }
 
 .about-section {
-  margin-bottom: 20px;
+  margin-bottom: 25px;
   text-align: center;
 }
 
 .about-section h3 {
   color: #667eea;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
   font-size: 1.1em;
   text-align: center;
+  font-weight: 700;
+}
+
+.about-section p {
+  text-align: center;
+  color: #6c757d;
+  line-height: 1.5;
+  max-width: 450px;
+  margin: 0 auto;
 }
 
 .features-list {
@@ -464,9 +487,28 @@
 }
 
 .features-list li {
-  padding: 8px 0;
+  padding: 12px 0;
   border-bottom: 1px solid #f0f0f0;
-  text-align: left;
+  line-height: 1.5;
+}
+
+.features-list li:last-child {
+  border-bottom: none;
+}
+
+.features-list strong {
+  color: #2c3e50;
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* Token Details Styling */
+.features-list li:nth-child(n+5) {
+  background: rgba(102, 126, 234, 0.05);
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin: 5px 0;
+  border: 1px solid rgba(102, 126, 234, 0.1);
 }
 
 .actions-section {
@@ -512,6 +554,12 @@
   border-color: #667eea;
   outline: none;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.input-field:disabled {
+  background: #f8f9fa;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .owner-section {
@@ -593,6 +641,75 @@
   font-size: 0.8em;
 }
 
+/* Loading States */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  color: white;
+  font-weight: 600;
+}
+
+.loading-spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #667eea;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Transaction Status Messages */
+.transaction-status {
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin: 0 10px 15px 10px;
+  text-align: center;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  animation: slideDown 0.3s ease;
+  max-width: 500px;
+  width: 100%;
+}
+
+.transaction-status.success {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+  border: 1px solid #28a745;
+}
+
+.transaction-status.error {
+  background: linear-gradient(135deg, #dc3545, #c82333);
+  color: white;
+  border: 1px solid #dc3545;
+}
+
+.transaction-status.info {
+  background: linear-gradient(135deg, #17a2b8, #138496);
+  color: white;
+  border: 1px solid #17a2b8;
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Enhanced Mobile Responsiveness */
 @media (max-width: 768px) {
   .app {
     font-size: 12px;
@@ -649,17 +766,23 @@
 }
 
 @media (max-width: 480px) {
-  .action-buttons-row {
-    flex-direction: column;
-    align-items: center;
+  .transaction-status {
+    margin: 0 5px 10px 5px;
+    font-size: 0.9em;
+    padding: 10px 15px;
   }
   
-  .action-button.compact {
-    width: 100%;
-    max-width: 200px;
+  .buy-section {
+    margin: 15px 0;
   }
   
-  .import-value.copyable {
-    font-size: 0.75em;
+  .estimated-amount {
+    font-size: 0.85em;
+    padding: 6px 10px;
+  }
+  
+  .buy-input-group .input-field,
+  .buy-input-group .buy-button {
+    max-width: 100%;
   }
 }
