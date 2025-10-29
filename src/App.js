@@ -345,39 +345,99 @@ function App() {
                 </div>
               )}
 
-              {/* About Section */}
+              {/* Enhanced About Section */}
               {activeSection === 'about' && (
                 <div className="section-content">
                   <div className="about-content">
                     <div className="about-section">
-                      <h3>What is JINGRM?</h3>
-                      <p>JINGRM (Jing Real Money) is a utility token built on Ethereum Mainnet, designed for secure digital transactions and ecosystem services.</p>
+                      <h2>What is JINGRM?</h2>
+                      <p className="intro-text">
+                        JINGRM (Jing Real Money) is a utility token built on Ethereum Mainnet, designed to power secure, transparent transactions across the JingNode ecosystem. It's not just for investors — it's for anyone who wants to engage with digital assets confidently and practically.
+                      </p>
+                      
+                      <div className="value-props-grid">
+                        <div className="value-prop-card">
+                          <div className="value-prop-icon">🎯</div>
+                          <h4>Fixed Pricing</h4>
+                          <p>1 ETH = 1,000 JINGRM - No volatility, predictable exchange rate</p>
+                        </div>
+                        <div className="value-prop-card">
+                          <div className="value-prop-icon">🔗</div>
+                          <h4>Ethereum Mainnet</h4>
+                          <p>Built on Ethereum for security, liquidity, and global reach</p>
+                        </div>
+                        <div className="value-prop-card">
+                          <div className="value-prop-icon">💼</div>
+                          <h4>Real Utility</h4>
+                          <p>Power JingNode services, cloud infrastructure, and smart contracts</p>
+                        </div>
+                        <div className="value-prop-card">
+                          <div className="value-prop-icon">📈</div>
+                          <h4>Capped Supply</h4>
+                          <p>Limited supply supports long-term value and scarcity</p>
+                        </div>
+                      </div>
                     </div>
+
                     <div className="about-section">
                       <h3>How to Get Started</h3>
+                      <div className="steps-grid">
+                        <div className="step-card">
+                          <div className="step-number">1</div>
+                          <h4>Import to Wallet</h4>
+                          <p>Click "Import to Wallet" to add JINGRM to your wallet for easy tracking and management</p>
+                        </div>
+                        <div className="step-card">
+                          <div className="step-number">2</div>
+                          <h4>Buy Tokens</h4>
+                          <p>Enter ETH amount and click "Buy JINGRM" to purchase tokens at {tokenPriceEth} ETH each</p>
+                        </div>
+                        <div className="step-card">
+                          <div className="step-number">3</div>
+                          <h4>Use or Transfer</h4>
+                          <p>Access JingNode services or transfer tokens to other addresses</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="about-section">
+                      <h3>Real-World Use Cases</h3>
                       <ul className="features-list">
-                        <li>
-                          <strong>1. Import to Wallet</strong> - Click "Import to Wallet" to add JINGRM to your wallet for easy tracking and management
-                        </li>
-                        <li>
-                          <strong>2. Buy Tokens</strong> - Enter ETH amount and click "Buy JINGRM" to purchase tokens at {tokenPriceEth} ETH each
-                        </li>
-                        <li>
-                          <strong>3. Transfer Tokens</strong> - Send tokens to other addresses using the transfer section
-                        </li>
-                        <li>
-                          <strong>4. Manage Balance</strong> - Click "Refresh Balance" to see your latest token amounts
-                        </li>
+                        <li>💰 <strong>Pay for JingNode Services</strong> - Cloud infrastructure, DevOps automation, and smart contract audits</li>
+                        <li>⚡ <strong>Deploy Smart Contracts</strong> - Launch and manage secure blockchain applications</li>
+                        <li>🔒 <strong>Access Secure Operations</strong> - Power backend systems with transparency</li>
+                        <li>🌍 <strong>Global Transactions</strong> - Transact with confidence across the ecosystem</li>
                       </ul>
                     </div>
+
                     <div className="about-section">
-                      <h3>Token Details</h3>
-                      <ul className="features-list">
-                        <li>💰 <strong>Fixed Price:</strong> {tokenPriceEth} ETH per JINGRM</li>
-                        <li>📊 <strong>Exchange Rate:</strong> 1 ETH = {Number(ratePerEth).toLocaleString()} JINGRM</li>
-                        <li>🔗 <strong>Network:</strong> Ethereum Mainnet</li>
-                        <li>🛡️ <strong>Security:</strong> Fully audited smart contract</li>
-                      </ul>
+                      <h3>Why Choose JINGRM?</h3>
+                      <div className="benefits-grid">
+                        <div className="benefit-item">
+                          <strong>Utility-Based Token</strong>
+                          <span>Real demand from service usage</span>
+                        </div>
+                        <div className="benefit-item">
+                          <strong>Ethereum-Backed</strong>
+                          <span>Security, liquidity, and wallet compatibility</span>
+                        </div>
+                        <div className="benefit-item">
+                          <strong>Transparent Pricing</strong>
+                          <span>Predictable exchange rate (1 ETH = 1,000 JINGRM)</span>
+                        </div>
+                        <div className="benefit-item">
+                          <strong>Capped Supply</strong>
+                          <span>Scarcity supports long-term value</span>
+                        </div>
+                        <div className="benefit-item">
+                          <strong>Real-World Integration</strong>
+                          <span>Used in cloud, DevOps, and smart contracts</span>
+                        </div>
+                        <div className="benefit-item">
+                          <strong>Easy Access</strong>
+                          <span>Anyone can buy and use — not just investors</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
