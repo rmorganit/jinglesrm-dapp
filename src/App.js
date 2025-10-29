@@ -11,6 +11,7 @@ function App() {
     tokenPriceEth,
     ratePerEth,
     isOwner,
+    contractBalance,
     connectWallet,
     refreshBalance,
     transferTokens,
@@ -25,6 +26,7 @@ function App() {
   const [transferAmount, setTransferAmount] = useState("");
   const [buyAmount, setBuyAmount] = useState("");
   const [newPrice, setNewPrice] = useState("");
+  const [activeSection, setActiveSection] = useState("buy");
 
   useEffect(() => {
     if (error) {
@@ -55,6 +57,8 @@ function App() {
     try {
       await buyTokens(buyAmount);
       setBuyAmount("");
+      // Force refresh balance after purchase
+      await refreshBalance();
       alert("🛒 Tokens purchased successfully!");
     } catch (err) {
       alert("❌ Buy failed: " + err.message);
@@ -86,33 +90,47 @@ function App() {
     }
   };
 
-  const handleImportToken = () => {
+  const handleImportToken = async () => {
     if (window.ethereum) {
-      window.ethereum.request({
-        method: 'wallet_watchAsset',
-        params: {
-          type: 'ERC20',
-          options: {
-            address: '0x15c12f6854c88175d2cd1448ffcf668be61cf4aa',
-            symbol: tokenSymbol,
-            decimals: 18,
-            image: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x15c12f6854c88175d2cd1448ffcf668be61cf4aa/logo.png'
+      try {
+        const success = await window.ethereum.request({
+          method: 'wallet_watchAsset',
+          params: {
+            type: 'ERC20',
+            options: {
+              address: '0x15c12f6854c88175d2cd1448ffcf668be61cf4aa',
+              symbol: tokenSymbol,
+              decimals: 18,
+              image: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x15c12f6854c88175d2cd1448ffcf668be61cf4aa/logo.png'
+            },
           },
-        },
-      }).then((success) => {
+        });
+        
         if (success) {
           alert('✅ Token imported successfully to your wallet!');
         } else {
           alert('❌ Token import cancelled or failed');
         }
-      }).catch(console.error);
+      } catch (err) {
+        console.error('Import token error:', err);
+        alert('❌ Token import failed: ' + err.message);
+      }
     } else {
       alert('Please install MetaMask or another Web3 wallet');
     }
   };
 
+  const handleRefreshBalance = async () => {
+    try {
+      await refreshBalance();
+      alert("✅ Balance refreshed!");
+    } catch (err) {
+      alert("❌ Refresh failed: " + err.message);
+    }
+  };
+
   const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text);
+    navigator.clipboard.writeText('0x15c12f6854c88175d2cd1448ffcf668be61cf4aa');
     alert('Contract address copied to clipboard!');
   };
 
@@ -136,82 +154,143 @@ function App() {
           </div>
         ) : (
           <div className="dashboard">
-            {/* Account Information Card */}
-            <div className="info-card">
-              <h2>👤 Account Information</h2>
-              <div className="info-grid">
-                <div className="info-item">
-                  <div className="info-label">Account Address</div>
-                  <div className="info-value account-address">
-                    {account.substring(0, 6)}...{account.substring(account.length - 4)}
-                  </div>
-                </div>
-                
-                <div className="info-item">
-                  <div className="info-label">Network Status</div>
-                  <div className="info-value">
-                    Ethereum Mainnet <span className="network-badge">✅ Connected</span>
-                  </div>
-                </div>
-                
-                <div className="info-item">
-                  <div className="info-label">Your Balance</div>
-                  <div className="info-value balance-highlight">
-                    {Number(jingBalance).toLocaleString()} {tokenSymbol}
-                  </div>
-                </div>
-                
-                <div className="info-item">
-                  <div className="info-label">Total Supply</div>
-                  <div className="info-value">
-                    {Number(totalSupply).toLocaleString()} {tokenSymbol}
-                  </div>
-                </div>
-                
-                <div className="info-item">
-                  <div className="info-label">Token Price</div>
-                  <div className="info-value">
-                    {tokenPriceEth} ETH
-                  </div>
-                </div>
-                
-                <div className="info-item">
-                  <div className="info-label">Exchange Rate</div>
-                  <div className="info-value">
-                    1 ETH = {Number(ratePerEth).toLocaleString()} {tokenSymbol}
-                  </div>
-                </div>
-
-                {/* Account Status */}
-                <div className="info-item">
-                  <div className="info-label">Account Status</div>
-                  <div className="info-value">
-                    {isOwner ? (
-                      <span className="owner-badge">👑 Owner Account</span>
-                    ) : (
-                      <span className="user-badge">👤 User Account</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-              
-              <div className="action-group">
-                <button className="action-button secondary-button" onClick={refreshBalance}>
-                  🔄 Refresh Balance
-                </button>
+            {/* Centered Account Status */}
+            <div className="account-status-centered">
+              <div className={`status-badge-large ${isOwner ? 'owner' : 'user'}`}>
+                {isOwner ? '👑 Owner Account' : '👤 User Account'}
               </div>
             </div>
 
-            {/* Actions Section */}
-            <div className="actions-section">
-              <h2>⚡ Actions</h2>
-              
-              {/* Transfer Tokens */}
-              <div className="transaction-section">
-                <div className="section-header">
-                  <span>🔄</span>
-                  <h3>Transfer Tokens</h3>
+            {/* Main Content Card */}
+            <div className="info-card">
+              {/* Section Tabs */}
+              <div className="section-tabs">
+                <button 
+                  className={`section-tab ${activeSection === 'buy' ? 'active' : ''}`}
+                  onClick={() => setActiveSection('buy')}
+                >
+                  🛒 BUY JINGRM
+                </button>
+                <button 
+                  className={`section-tab ${activeSection === 'about' ? 'active' : ''}`}
+                  onClick={() => setActiveSection('about')}
+                >
+                  ℹ️ ABOUT JINGRM
+                </button>
+              </div>
+
+              {/* Buy Section */}
+              {activeSection === 'buy' && (
+                <div className="section-content">
+                  <h2>Buy JINGRM Tokens</h2>
+                  
+                  {/* Price and Rate Info at the Top */}
+                  <div className="price-rate-section">
+                    <div className="price-item">
+                      <span className="price-label">💰 Price:</span>
+                      <span className="price-value">{tokenPriceEth} ETH / JINGRM</span>
+                    </div>
+                    <div className="rate-item">
+                      <span className="rate-label">📊 Rate:</span>
+                      <span className="rate-value">1 ETH ≈ {Number(ratePerEth).toLocaleString()} JINGRM</span>
+                    </div>
+                  </div>
+
+                  <div className="compact-info-grid">
+                    <div className="info-item highlight">
+                      <div className="info-label">Your Balance</div>
+                      <div className="info-value balance-highlight">
+                        {Number(jingBalance).toLocaleString()} {tokenSymbol}
+                      </div>
+                    </div>
+                    
+                    <div className="info-item">
+                      <div className="info-label">Total Supply</div>
+                      <div className="info-value">
+                        {Number(totalSupply).toLocaleString()} {tokenSymbol}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Buy Section */}
+                  <div className="buy-section">
+                    <div className="buy-input-group">
+                      <input
+                        type="number"
+                        step="0.0001"
+                        placeholder="ETH Amount (e.g., 0.01)"
+                        value={buyAmount}
+                        onChange={(e) => setBuyAmount(e.target.value)}
+                        className="input-field"
+                      />
+                      <button className="action-button buy-button" onClick={handleBuy}>
+                        🛒 Buy {tokenSymbol}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="action-buttons-row">
+                    <button className="action-button refresh-button compact" onClick={handleRefreshBalance}>
+                      🔄 Refresh Balance
+                    </button>
+                    <button className="action-button import-button compact" onClick={handleImportToken}>
+                      📥 Import to Wallet
+                    </button>
+                  </div>
+
+                  {/* Token Import Info Section */}
+                  <div className="import-info-section">
+                    <h4>Token Information</h4>
+                    <div className="import-info-grid">
+                      <div className="import-info-item">
+                        <span className="import-label">Contract:</span>
+                        <span className="import-value" onClick={copyToClipboard}>
+                          0x15c12...f4aa
+                        </span>
+                      </div>
+                      <div className="import-info-item">
+                        <span className="import-label">Symbol:</span>
+                        <span className="import-value">{tokenSymbol}</span>
+                      </div>
+                      <div className="import-info-item">
+                        <span className="import-label">Decimals:</span>
+                        <span className="import-value">18</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+              )}
+
+              {/* About Section */}
+              {activeSection === 'about' && (
+                <div className="section-content">
+                  <h2>About JINGRM</h2>
+                  
+                  <div className="about-content">
+                    <div className="about-section">
+                      <h3>What is JINGRM?</h3>
+                      <p>JINGRM (Jing Real Money) is a utility token built on Ethereum Mainnet, designed to facilitate secure, transparent transactions across digital ecosystems.</p>
+                    </div>
+
+                    <div className="about-section">
+                      <h3>Key Features</h3>
+                      <ul className="features-list">
+                        <li>🎯 <strong>Fixed Pricing:</strong> 1 ETH = 1,000 JINGRM</li>
+                        <li>🔒 <strong>Ethereum Security:</strong> Built on Mainnet</li>
+                        <li>💼 <strong>Real Utility:</strong> Powers services and transactions</li>
+                        <li>🌍 <strong>Easy Access:</strong> No technical expertise required</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Always visible actions */}
+            <div className="actions-section">
+              <h3>Token Transfer</h3>
+              
+              <div className="transaction-section">
                 <div className="input-group">
                   <input
                     type="text"
@@ -227,89 +306,16 @@ function App() {
                     onChange={(e) => setTransferAmount(e.target.value)}
                     className="input-field"
                   />
-                  <button className="action-button" onClick={handleTransfer}>
-                    Transfer {tokenSymbol}
+                  <button className="action-button transfer-button" onClick={handleTransfer}>
+                    Transfer
                   </button>
                 </div>
               </div>
 
-              {/* Buy Tokens */}
-              <div className="transaction-section">
-                <div className="section-header">
-                  <span>🛒</span>
-                  <h3>Buy Tokens</h3>
-                </div>
-                <div className="rate-display">
-                  <p>💰 <strong>Price:</strong> {tokenPriceEth} ETH / {tokenSymbol}</p>
-                  <p>📊 <strong>Rate:</strong> 1 ETH ≈ {Number(ratePerEth).toLocaleString()} {tokenSymbol}</p>
-                </div>
-                <div className="input-group">
-                  <input
-                    type="number"
-                    step="0.0001"
-                    placeholder="ETH Amount (e.g., 0.01)"
-                    value={buyAmount}
-                    onChange={(e) => setBuyAmount(e.target.value)}
-                    className="input-field"
-                  />
-                  <button className="action-button" onClick={handleBuy}>
-                    Buy {tokenSymbol}
-                  </button>
-                </div>
-              </div>
-
-              {/* Import Token Section */}
-              <div className="transaction-section">
-                <div className="section-header">
-                  <span>📥</span>
-                  <h3>Import {tokenSymbol} Token</h3>
-                </div>
-                <div className="info-grid">
-                  <div className="info-item">
-                    <div className="info-label">Contract Address</div>
-                    <div 
-                      className="info-value copyable-address" 
-                      onClick={() => copyToClipboard('0x15c12f6854c88175d2cd1448ffcf668be61cf4aa')}
-                    >
-                      0x15c12...f4aa
-                      <span className="copy-icon">📋</span>
-                    </div>
-                  </div>
-                  <div className="info-item">
-                    <div className="info-label">Token Symbol</div>
-                    <div className="info-value">{tokenSymbol}</div>
-                  </div>
-                  <div className="info-item">
-                    <div className="info-label">Decimals</div>
-                    <div className="info-value">18</div>
-                  </div>
-                </div>
-                <div className="action-group">
-                  <button 
-                    className="action-button import-button" 
-                    onClick={handleImportToken}
-                  >
-                    📥 Import {tokenSymbol} to Wallet
-                  </button>
-                </div>
-                <div className="rate-display">
-                  <p>💡 <strong>Tip:</strong> This adds {tokenSymbol} to your wallet's token list for easy tracking</p>
-                </div>
-              </div>
-
-              {/* Owner Controls */}
               {isOwner && (
                 <>
-                  {/* Price Management */}
                   <div className="transaction-section owner-section">
-                    <div className="section-header">
-                      <span>💰</span>
-                      <h3>Price Management</h3>
-                    </div>
-                    <div className="rate-display">
-                      <p>📈 <strong>Current Price:</strong> {tokenPriceEth} ETH</p>
-                      <p>🔢 <strong>Rate:</strong> 1 ETH ≈ {Number(ratePerEth).toLocaleString()} {tokenSymbol}</p>
-                    </div>
+                    <h3>Owner Controls</h3>
                     <div className="input-group">
                       <input
                         type="number"
@@ -319,27 +325,21 @@ function App() {
                         onChange={(e) => setNewPrice(e.target.value)}
                         className="input-field"
                       />
-                      <button className="action-button" onClick={handleSetPrice}>
+                      <button className="action-button price-button" onClick={handleSetPrice}>
                         Update Price
                       </button>
                     </div>
-                  </div>
-
-                  {/* Withdraw ETH */}
-                  <div className="transaction-section owner-section">
-                    <div className="section-header">
-                      <span>💸</span>
-                      <h3>Contract Funds</h3>
+                    
+                    <div className="contract-balance">
+                      <span>Contract Balance: {contractBalance} ETH</span>
+                      <button className="action-button withdraw-button" onClick={handleWithdraw}>
+                        Withdraw ETH
+                      </button>
                     </div>
-                    <button className="action-button warning-button" onClick={handleWithdraw}>
-                      Withdraw ETH from Contract
-                    </button>
                   </div>
                 </>
               )}
             </div>
-
-            {/* REMOVED: The entire bottom section that was displaying duplicate Token Information */}
           </div>
         )}
 
@@ -353,7 +353,7 @@ function App() {
       </div>
 
       <footer className="app-footer">
-        <p>JING Token dApp • Built on Ethereum Mainnet • Secure & Decentralized</p>
+        <p>JING Token dApp • Built on Ethereum Mainnet</p>
       </footer>
     </div>
   );
