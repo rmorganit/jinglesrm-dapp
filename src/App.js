@@ -30,6 +30,11 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [transactionStatus, setTransactionStatus] = useState("");
   const [currentAction, setCurrentAction] = useState("");
+  const [hasMetaMask, setHasMetaMask] = useState(true);
+
+  useEffect(() => {
+    setHasMetaMask(!!window.ethereum);
+  }, []);
 
   useEffect(() => {
     if (error) {
@@ -54,7 +59,7 @@ function App() {
       await transferTokens(transferTo, transferAmount);
       setTransferTo("");
       setTransferAmount("");
-      showStatus(`✅ Successfully transferred ${transferAmount} ${tokenSymbol} to ${transferTo.slice(0, 8)}...`);
+      showStatus(`✅ Successfully sent ${transferAmount} ${tokenSymbol}`);
     } catch (err) {
       showStatus(`❌ Transfer failed: ${err.message}`, "error");
     } finally {
@@ -65,7 +70,7 @@ function App() {
 
   const handleBuy = async () => {
     if (!buyAmount || parseFloat(buyAmount) <= 0) {
-      showStatus("Please enter a valid ETH amount to buy tokens", "error");
+      showStatus("Please enter a valid ETH amount", "error");
       return;
     }
     
@@ -75,7 +80,7 @@ function App() {
       const estimatedTokens = (buyAmount * ratePerEth).toLocaleString();
       await buyTokens(buyAmount);
       setBuyAmount("");
-      showStatus(`✅ Success! Purchased ≈${estimatedTokens} ${tokenSymbol} for ${buyAmount} ETH`);
+      showStatus(`✅ Success! Purchased ≈${estimatedTokens} ${tokenSymbol}`);
     } catch (err) {
       showStatus(`❌ Purchase failed: ${err.message}`, "error");
     } finally {
@@ -95,7 +100,7 @@ function App() {
     try {
       await setNewTokenPrice(newPrice);
       setNewPrice("");
-      showStatus(`✅ Token price updated to ${newPrice} ETH per ${tokenSymbol}`);
+      showStatus(`✅ Token price updated to ${newPrice} ETH`);
     } catch (err) {
       showStatus(`❌ Price update failed: ${err.message}`, "error");
     } finally {
@@ -114,7 +119,7 @@ function App() {
     setCurrentAction("withdraw");
     try {
       await withdrawETH();
-      showStatus(`✅ Successfully withdrew ${contractBalance} ETH from contract`);
+      showStatus(`✅ Successfully withdrew ${contractBalance} ETH`);
     } catch (err) {
       showStatus(`❌ Withdrawal failed: ${err.message}`, "error");
     } finally {
@@ -140,9 +145,9 @@ function App() {
       });
       
       if (success) {
-        showStatus('✅ Token successfully added to your wallet!');
+        showStatus('✅ Token added to your wallet!');
       } else {
-        showStatus('Token import was cancelled', "info");
+        showStatus('Token import cancelled', "info");
       }
     } catch (err) {
       showStatus(`❌ Import failed: ${err.message}`, "error");
@@ -157,7 +162,8 @@ function App() {
     setCurrentAction("refresh");
     try {
       await refreshBalance();
-      showStatus("✅ Balance updated successfully!");
+      setBuyAmount(""); // Clear the buy amount field
+      showStatus("✅ Balance updated!");
     } catch (err) {
       showStatus(`❌ Refresh failed: ${err.message}`, "error");
     } finally {
@@ -168,7 +174,7 @@ function App() {
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText('0x15c12f6854c88175d2cd1448ffcf668be61cf4aa');
-    showStatus("📋 Contract address copied to clipboard!");
+    showStatus("📋 Contract address copied!");
   };
 
   const getButtonText = (action, defaultText) => {
@@ -198,10 +204,32 @@ function App() {
           <div className="welcome-section">
             <div className="welcome-card">
               <h2>🚀 Welcome to JING Token Manager</h2>
-              <p>Connect your wallet to start managing your {tokenSymbol} tokens</p>
-              <button className="connect-button" onClick={connectWallet}>
-                🔗 Connect Wallet
-              </button>
+              <p>Get started with JINGRM tokens in just a few steps</p>
+              
+              {!hasMetaMask ? (
+                <div className="metamask-prompt">
+                  <div className="metamask-header">
+                    <div className="metamask-icon">🦊</div>
+                    <h3>Get MetaMask</h3>
+                  </div>
+                  <p>You'll need MetaMask to interact with the blockchain</p>
+                  <a href="https://metamask.io" target="_blank" rel="noopener noreferrer" className="metamask-install-button">
+                    🦊 Get MetaMask
+                  </a>
+                  <p className="metamask-note">Once installed, refresh this page</p>
+                </div>
+              ) : (
+                <div className="connect-prompt">
+                  <div className="connect-header">
+                    <div className="connect-icon">🔗</div>
+                    <h3>Connect Your Wallet</h3>
+                  </div>
+                  <p>Connect your MetaMask wallet to start managing JINGRM tokens</p>
+                  <button className="connect-button" onClick={connectWallet}>
+                    🔗 Connect to Wallet
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         ) : (
@@ -277,31 +305,14 @@ function App() {
                     </div>
                   </div>
 
-                  {/* Action Buttons - Import First */}
-                  <div className="action-buttons-row">
-                    <button 
-                      className="action-button import-button compact" 
-                      onClick={handleImportToken}
-                      disabled={loading}
-                    >
-                      {getButtonText("import", "📥 Import to Wallet")}
-                    </button>
-                    <button 
-                      className="action-button refresh-button compact" 
-                      onClick={handleRefreshBalance}
-                      disabled={loading}
-                    >
-                      {getButtonText("refresh", "🔄 Refresh Balance")}
-                    </button>
-                  </div>
-
                   {/* Buy Section */}
                   <div className="buy-section">
+                    <h3>Buy {tokenSymbol}</h3>
                     <div className="buy-input-group">
                       <input
                         type="number"
                         step="0.0001"
-                        placeholder="ETH Amount (e.g., 0.01)"
+                        placeholder="Enter ETH amount (e.g., 0.01)"
                         value={buyAmount}
                         onChange={(e) => setBuyAmount(e.target.value)}
                         className="input-field"
@@ -317,14 +328,38 @@ function App() {
                     </div>
                     {buyAmount && parseFloat(buyAmount) > 0 && (
                       <div className="estimated-amount">
-                        ≈ {(buyAmount * ratePerEth).toLocaleString()} {tokenSymbol}
+                        You'll get ≈ {(buyAmount * ratePerEth).toLocaleString()} {tokenSymbol}
                       </div>
                     )}
                   </div>
 
+                  {/* Quick Actions */}
+                  <div className="quick-actions">
+                    <h3>Quick Actions</h3>
+                    <div className="action-buttons-row">
+                      <button 
+                        className="action-button import-button" 
+                        onClick={handleImportToken}
+                        disabled={loading}
+                      >
+                        {getButtonText("import", "🦊 Add to Wallet")}
+                      </button>
+                      <button 
+                        className="action-button refresh-button" 
+                        onClick={handleRefreshBalance}
+                        disabled={loading}
+                      >
+                        {getButtonText("refresh", "🔄 Refresh")}
+                      </button>
+                    </div>
+                    <p className="quick-actions-note">
+                      "Add to Wallet" saves the token to your MetaMask. "Refresh" updates your balance.
+                    </p>
+                  </div>
+
                   {/* Token Info */}
                   <div className="import-info-section">
-                    <h4>Token Information</h4>
+                    <h3>Token Information</h3>
                     <div className="import-info-grid">
                       <div className="import-info-item">
                         <span className="import-label">Contract:</span>
@@ -345,14 +380,14 @@ function App() {
                 </div>
               )}
 
-              {/* Optimized About Section */}
+              {/* About Section */}
               {activeSection === 'about' && (
                 <div className="section-content">
                   <div className="about-content">
                     <div className="about-section">
                       <h2>What is JINGRM?</h2>
                       <p className="intro-text">
-                        JINGRM is a utility token built on the <strong>Ethereum blockchain</strong>, designed to power secure, transparent transactions across the JingNode ecosystem using <strong>blockchain technology</strong>.
+                        JINGRM is a utility token built on the <strong>Ethereum blockchain</strong>, designed to power secure, transparent transactions across the JingNode ecosystem.
                       </p>
                       
                       <div className="value-props-grid">
@@ -375,42 +410,72 @@ function App() {
                     </div>
 
                     <div className="about-section">
-                      <h3>Get Started in 4 Steps</h3>
+                      <h3>Getting Started Guide</h3>
                       <div className="steps-grid">
                         <div className="step-card">
                           <div className="step-number">1</div>
                           <h4>Install MetaMask</h4>
-                          <p>Get the MetaMask wallet for browser or mobile</p>
-                          <a href="https://metamask.io" target="_blank" rel="noopener noreferrer" className="metamask-link">
-                            🔗 Get MetaMask
-                          </a>
+                          <p>Get the browser wallet to interact with blockchain</p>
                         </div>
                         <div className="step-card">
                           <div className="step-number">2</div>
-                          <h4>Import Token</h4>
-                          <p>Click "Import to Wallet" to add JINGRM</p>
+                          <h4>Connect Wallet</h4>
+                          <p>Link your MetaMask to this dApp</p>
                         </div>
                         <div className="step-card">
                           <div className="step-number">3</div>
-                          <h4>Buy Tokens</h4>
-                          <p>Enter ETH amount to purchase at {tokenPriceEth} ETH each</p>
-                        </div>
-                        <div className="step-card">
-                          <div className="step-number">4</div>
-                          <h4>Use Tokens</h4>
-                          <p>Access services or transfer on the blockchain</p>
+                          <h4>Buy & Import</h4>
+                          <p>Purchase tokens and add to your wallet</p>
                         </div>
                       </div>
                     </div>
 
                     <div className="about-section">
-                      <h3>Blockchain Use Cases</h3>
-                      <ul className="features-list">
-                        <li>💰 <strong>Pay for JingNode Services</strong> - Cloud infrastructure on blockchain</li>
-                        <li>⚡ <strong>Deploy Smart Contracts</strong> - Launch blockchain applications</li>
-                        <li>🔒 <strong>Secure Transactions</strong> - Blockchain-powered operations</li>
-                        <li>🌍 <strong>Global Access</strong> - Borderless blockchain transactions</li>
-                      </ul>
+                      <h3>Token Details</h3>
+                      <div className="token-details-grid">
+                        <div className="token-detail-item">
+                          <span className="detail-label">Token Name:</span>
+                          <span className="detail-value">JINGRM</span>
+                        </div>
+                        <div className="token-detail-item">
+                          <span className="detail-label">Token Symbol:</span>
+                          <span className="detail-value">{tokenSymbol}</span>
+                        </div>
+                        <div className="token-detail-item">
+                          <span className="detail-label">Total Supply:</span>
+                          <span className="detail-value">{Number(totalSupply).toLocaleString()} {tokenSymbol}</span>
+                        </div>
+                        <div className="token-detail-item">
+                          <span className="detail-label">Current Price:</span>
+                          <span className="detail-value">{tokenPriceEth} ETH</span>
+                        </div>
+                        <div className="token-detail-item">
+                          <span className="detail-label">Exchange Rate:</span>
+                          <span className="detail-value">1 ETH = {Number(ratePerEth).toLocaleString()} {tokenSymbol}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="about-section">
+                      <h3>Features & Benefits</h3>
+                      <div className="features-list">
+                        <div className="feature-item">
+                          <span className="feature-icon">⚡</span>
+                          <span className="feature-text">Fast transactions on Ethereum network</span>
+                        </div>
+                        <div className="feature-item">
+                          <span className="feature-icon">🔒</span>
+                          <span className="feature-text">Secure and transparent blockchain technology</span>
+                        </div>
+                        <div className="feature-item">
+                          <span className="feature-icon">🌐</span>
+                          <span className="feature-text">Global accessibility and interoperability</span>
+                        </div>
+                        <div className="feature-item">
+                          <span className="feature-icon">💎</span>
+                          <span className="feature-text">Limited supply for value preservation</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -419,7 +484,7 @@ function App() {
 
             {/* Transfer Section */}
             <div className="actions-section">
-              <h3>Token Transfer</h3>
+              <h3>Transfer Tokens</h3>
               <div className="transaction-section">
                 <div className="input-group">
                   <input
@@ -443,7 +508,7 @@ function App() {
                     onClick={handleTransfer}
                     disabled={loading}
                   >
-                    {getButtonText("transfer", "Transfer")}
+                    {getButtonText("transfer", "Send Tokens")}
                   </button>
                 </div>
               </div>
